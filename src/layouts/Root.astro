@@ -2,16 +2,19 @@
 import Head from './Head.astro';
 import Header from './Header.astro';
 import Footer from './Footer.astro';
+import Scanlines from '../components/Scanlines.astro';
 import "../styles/global.css";
+
 const { title, description, class: className } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="en">
 	<Head title={title} description={description} />
-	<body class:list={[className]}>
+	<body>
 		<Header />
-		<main>
+		<main class:list={[ 'relative', [className] ]}>
+			<Scanlines />
 			<slot />
 		</main>
 		<Footer />
