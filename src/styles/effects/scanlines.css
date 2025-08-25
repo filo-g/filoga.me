@@ -1,0 +1,25 @@
+.scanlines {
+    @apply absolute inset-0 z-10 pointer-events-none;
+
+    background:
+        linear-gradient(
+            transparent 50%,
+            color-mix(in oklab, oklch(0.8736 0.2946 142.6) 3%, transparent) 50%
+        ),
+        linear-gradient(
+            90deg,
+            transparent 50%,
+            color-mix(in oklab, oklch(0.6279 0.2578 29.1) 1%, transparent) 50%
+        );
+    background-size: 100% 0.5rem, 0.5rem 100%;
+    animation: scanlines 0.1s linear infinite;
+}
+
+@keyframes scanlines {
+    0% {
+        transform: translateY(0rem);
+    }
+    100% {
+        transform: translateY(0.5rem);
+    }
+}
