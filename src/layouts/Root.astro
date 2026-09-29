@@ -14,11 +14,13 @@ const { title, description, class: className } = Astro.props;
 	<Head title={title} description={description} />
 	<body class="bg-black">
 		<Header />
-		<main class:list={[className]}>
+		<main class:list={["relative isolate", className]}>
 			<div class="screen relative">
 				<slot />
 				<Scanlines />
 			</div>
+			<div class="screen-glow" aria-hidden="true"></div>
+			<div class="refresh-band" aria-hidden="true"></div>
 		</main>
 		<SvgFilters />
 		<Footer />
