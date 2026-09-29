@@ -12,7 +12,7 @@ const { title, description, class: className } = Astro.props;
 <!doctype html>
 <html lang="en">
 	<Head title={title} description={description} />
-	<body>
+	<body class="bg-black">
 		<Header />
 		<main class:list={[className]}>
 			<div class="screen relative">
