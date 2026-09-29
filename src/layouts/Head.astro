@@ -9,4 +9,8 @@ const { title, description } = Astro.props;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <!-- CRT effects are a progressive enhancement: no JS or reduced motion keeps a plain screen -->
+    <script is:inline>
+        if (!matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("crt");
+    </script>
 </head>

@@ -1,4 +1,13 @@
 @import "tailwindcss";
 
+@import "./effects/phosphor.css";
 @import "./effects/scanlines.css";
 @import "./effects/screen.css";
+
+@theme {
+    /* P1 phosphor: pale green core, more saturated green halo */
+    --color-phosphor: oklch(0.74 0.08 150);
+    --color-phosphor-glow: oklch(0.64 0.11 148);
+    /* Unlit phosphor glass, slightly lighter than the bezel */
+    --color-screen: oklch(0.17 0.012 160);
+}
