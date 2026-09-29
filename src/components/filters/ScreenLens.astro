@@ -1,9 +1,26 @@
-<filter id="screenLens" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">
-    <!-- Maps are stored in the alpha channel, the only one untouched by display color management (e.g. Mac P3 screens) -->
-    <feImage id="screenLensMapX" result="lensX" preserveAspectRatio="none"></feImage>
-    <feImage id="screenLensMapY" result="lensY" preserveAspectRatio="none"></feImage>
-    <feColorMatrix in="lensX" result="lensR" type="matrix" values="0 0 0 1 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0 1"></feColorMatrix>
-    <feColorMatrix in="lensY" result="lensG" type="matrix" values="0 0 0 0 0  0 0 0 1 0  0 0 0 0 0  0 0 0 0 1"></feColorMatrix>
-    <feComposite in="lensR" in2="lensG" result="lens" operator="arithmetic" k2="1" k3="1"></feComposite>
-    <feDisplacementMap id="screenLensDisplacement" in="SourceGraphic" in2="lens" scale="0" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+<filter
+    id="screenLens"
+    x="0" y="0" width="1" height="1"
+    color-interpolation-filters="sRGB"
+>
+    <!-- Alpha maps, the only channel color management leaves untouched -->
+    <feImage id="screenLensMapX" result="x" preserveAspectRatio="none" />
+    <feImage id="screenLensMapY" result="y" preserveAspectRatio="none" />
+    <feColorMatrix
+        in="x" result="r" type="matrix"
+        values="0 0 0 1 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0 1"
+    />
+    <feColorMatrix
+        in="y" result="g" type="matrix"
+        values="0 0 0 0 0  0 0 0 1 0  0 0 0 0 0  0 0 0 0 1"
+    />
+    <feComposite
+        in="r" in2="g" result="lens"
+        operator="arithmetic" k2="1" k3="1"
+    />
+    <feDisplacementMap
+        id="screenLensDisplacement"
+        in="SourceGraphic" in2="lens" scale="0"
+        xChannelSelector="R" yChannelSelector="G"
+    />
 </filter>

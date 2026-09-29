@@ -1,6 +1,5 @@
-// Barrel distortion strength (fraction of the screen size displaced at the corners)
+// Fraction of the screen displaced at the corners
 const CURVATURE = 0.035;
-// Displacement map resolution relative to the screen (it gets smoothed when stretched)
 const MAP_RESOLUTION = 0.25;
 
 const screen = document.querySelector<HTMLElement>(".screen");
@@ -8,8 +7,10 @@ const mapX = document.getElementById("screenLensMapX");
 const mapY = document.getElementById("screenLensMapY");
 const displacement = document.getElementById("screenLensDisplacement");
 
-// Image where each pixel alpha stores its displacement (0.5 = no displacement)
-function alphaMap(width: number, height: number, value: (u: number, v: number) => number) {
+type Field = (u: number, v: number) => number;
+
+// Displacement stored in alpha, 0.5 = none
+function alphaMap(width: number, height: number, value: Field) {
     const canvas = document.createElement("canvas");
     canvas.width = width;
     canvas.height = height;
@@ -33,23 +34,28 @@ function alphaMap(width: number, height: number, value: (u: number, v: number) =
 function buildLens(width: number, height: number) {
     const mapWidth = Math.max(2, Math.round(width * MAP_RESOLUTION));
     const mapHeight = Math.max(2, Math.round(height * MAP_RESOLUTION));
-    // Max displacement happens at the corners (r² = 2), scale must cover it
+    // Max displacement at the corners (r² = 2)
     const scale = 2 * CURVATURE * Math.max(width, height);
+    const barrel = (axis: number, u: number, v: number, size: number) =>
+        0.5 + (axis * (u * u + v * v) * CURVATURE * (size / 2)) / scale;
 
-    // Sample further from the center the closer we are to the edges
-    const x = alphaMap(mapWidth, mapHeight, (u, v) => 0.5 + (u * (u * u + v * v) * CURVATURE * (width / 2)) / scale);
-    const y = alphaMap(mapWidth, mapHeight, (u, v) => 0.5 + (v * (u * u + v * v) * CURVATURE * (height / 2)) / scale);
+    const x = alphaMap(mapWidth, mapHeight, (u, v) => barrel(u, u, v, width));
+    const y = alphaMap(mapWidth, mapHeight, (u, v) => barrel(v, u, v, height));
 
     mapX?.setAttribute("href", x);
     mapY?.setAttribute("href", y);
     displacement?.setAttribute("scale", String(scale));
 }
 
-// Chromium color-converts the displacement input on wide gamut screens (e.g. Mac P3), bending the lens
-const isChromium = (navigator as Navigator & { userAgentData?: { brands: { brand: string }[] } }).userAgentData?.brands.some(({ brand }) => brand === "Chromium") ?? false;
+type UAData = { brands: { brand: string }[] };
+const uaData = (navigator as Navigator & { userAgentData?: UAData })
+    .userAgentData;
+const isChromium = uaData?.brands.some(({ brand }) => brand === "Chromium");
+
 const unsupported = [
     matchMedia("(prefers-reduced-motion: reduce)"),
     matchMedia("(max-width: 47.999rem)"),
+    // Chromium color-converts the lens map on wide gamut screens
     ...(isChromium ? [matchMedia("(color-gamut: p3)")] : []),
 ];
 

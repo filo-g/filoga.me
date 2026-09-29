@@ -1,6 +1,7 @@
-/* Light bleeding from the lit phosphor around each glyph */
 .crt .screen {
+    --glow: var(--color-phosphor-glow);
+
     text-shadow:
-        0 0 0.15em color-mix(in oklab, var(--color-phosphor-glow) 35%, transparent),
-        0 0 0.6em color-mix(in oklab, var(--color-phosphor-glow) 12%, transparent);
+        0 0 0.15em color-mix(in oklab, var(--glow) 35%, transparent),
+        0 0 0.6em color-mix(in oklab, var(--glow) 12%, transparent);
 }
