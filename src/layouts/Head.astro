@@ -16,7 +16,17 @@ const { title, description } = Astro.props;
         preload={[{ weight: 400, style: "normal" }]}
     />
     <script is:inline>
+        const root = document.documentElement;
         const reduce = matchMedia("(prefers-reduced-motion: reduce)");
-        if (!reduce.matches) document.documentElement.classList.add("crt");
+
+        if (!reduce.matches) {
+            root.classList.add("crt");
+            try {
+                if (!sessionStorage.getItem("crt-on")) {
+                    root.classList.add("crt-power-on");
+                    sessionStorage.setItem("crt-on", "1");
+                }
+            } catch {}
+        }
     </script>
 </head>

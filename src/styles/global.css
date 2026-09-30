@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 @import "./effects/phosphor.css";
+@import "./effects/power-on.css";
 @import "./effects/scanlines.css";
 @import "./effects/screen.css";
 

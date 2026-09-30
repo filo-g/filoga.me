@@ -17,11 +17,14 @@ const { title, description, class: className } = Astro.props;
 		<Header />
 		<main class:list={["relative isolate", className]}>
 			<div class="screen">
-				<div class="screen__output">
-					<slot />
+				<div class="screen__content">
+					<div class="screen__output">
+						<slot />
+					</div>
+					<Console />
 				</div>
-				<Console />
 				<Scanlines />
+				<div class="power-on-beam" aria-hidden="true"></div>
 			</div>
 			<div class="screen-glow" aria-hidden="true"></div>
 			<div class="refresh-band" aria-hidden="true"></div>

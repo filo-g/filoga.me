@@ -1,0 +1,42 @@
+.power-on-beam {
+    display: none;
+}
+
+.crt-power-on {
+    --power-on: 1.4s;
+}
+
+.crt-power-on .screen__content {
+    animation: power-on var(--power-on) ease-out both;
+}
+
+.crt-power-on .power-on-beam {
+    @apply pointer-events-none absolute inset-0 z-20 block;
+
+    background: color-mix(in oklab, var(--color-phosphor), white 30%);
+    animation:
+        power-on var(--power-on) ease-out both,
+        power-on-beam var(--power-on) ease-out both;
+}
+
+.crt-power-on .screen-glow {
+    animation: power-on-glow var(--power-on) ease-out both;
+}
+
+@keyframes power-on {
+    0% { clip-path: inset(50% 50%); }
+    12% { clip-path: inset(calc(50% - 1px) 49%); }
+    30% { clip-path: inset(calc(50% - 1px) 0); }
+    55%, 100% { clip-path: inset(0); }
+}
+
+@keyframes power-on-beam {
+    0%, 30% { opacity: 1; }
+    38% { opacity: 0.3; }
+    50%, 100% { opacity: 0; }
+}
+
+@keyframes power-on-glow {
+    0%, 30% { opacity: 0; }
+    55%, 100% { opacity: 1; }
+}
