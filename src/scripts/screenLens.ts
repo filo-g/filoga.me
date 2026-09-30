@@ -2,14 +2,15 @@
 const CURVATURE = 0.035;
 const MAP_RESOLUTION = 0.25;
 
-const screen = document.querySelector<HTMLElement>(".screen");
+const screenEl = document.querySelector<HTMLElement>(".screen");
 const mapX = document.getElementById("screenLensMapX");
 const mapY = document.getElementById("screenLensMapY");
 const displacement = document.getElementById("screenLensDisplacement");
+const glow = document.querySelector<HTMLElement>(".screen-glow");
 
 type Field = (u: number, v: number) => number;
 
-// Displacement stored in alpha, 0.5 = none
+// Alpha channel image from a field over the screen, u and v in [-1, 1]
 function alphaMap(width: number, height: number, value: Field) {
     const canvas = document.createElement("canvas");
     canvas.width = width;
@@ -45,6 +46,16 @@ function buildLens(width: number, height: number) {
     mapX?.setAttribute("href", x);
     mapY?.setAttribute("href", y);
     displacement?.setAttribute("scale", String(scale));
+
+    // Tube silhouette for the glow
+    const inside = (u: number, v: number) => {
+        const bulge = 1 + CURVATURE * (u * u + v * v);
+        return Math.abs(u * bulge) <= 1 && Math.abs(v * bulge) <= 1 ? 1 : 0;
+    };
+    glow?.style.setProperty(
+        "--tube",
+        `url(${alphaMap(mapWidth, mapHeight, inside)})`,
+    );
 }
 
 type UAData = { brands: { brand: string }[] };
@@ -59,7 +70,7 @@ const unsupported = [
     ...(isChromium ? [matchMedia("(color-gamut: p3)")] : []),
 ];
 
-if (screen && mapX && mapY && displacement) {
+if (screenEl && mapX && mapY && displacement) {
     let frame = 0;
     let size = { width: 0, height: 0 };
 
@@ -68,13 +79,13 @@ if (screen && mapX && mapY && displacement) {
         frame = requestAnimationFrame(() => {
             const enabled = !unsupported.some((query) => query.matches);
             if (enabled) buildLens(size.width, size.height);
-            screen.classList.toggle("screen--lens", enabled);
+            screenEl.classList.toggle("screen--lens", enabled);
         });
     };
 
     new ResizeObserver(([entry]) => {
         size = entry.contentRect;
         update();
-    }).observe(screen);
+    }).observe(screenEl);
     unsupported.forEach((query) => query.addEventListener("change", update));
 }

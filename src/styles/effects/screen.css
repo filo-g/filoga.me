@@ -19,17 +19,23 @@
     display: none;
 }
 
-/* Static element, drop-shadows on the lens re-blur on every repaint */
+/* Tube silhouette from the lens script, static so it's painted once */
 .screen--lens ~ .screen-glow {
-    @apply absolute -z-10 block pointer-events-none;
+    @apply absolute inset-0 -z-10 block pointer-events-none;
 
     --glow: var(--color-phosphor-glow);
 
-    inset: 3%;
-    border-radius: 4%;
+    filter: blur(1rem)
+        drop-shadow(0 0 2rem color-mix(in oklab, var(--glow) 25%, transparent));
+}
+
+/* Masked child, a mask on the blurred element would cut the blur off */
+.screen--lens ~ .screen-glow::before {
+    @apply absolute inset-0;
+
+    content: "";
     background: color-mix(in oklab, var(--glow) 22%, transparent);
-    box-shadow: 0 0 3rem color-mix(in oklab, var(--glow) 10%, transparent);
-    filter: blur(1rem);
+    mask: var(--tube) center / 100% 100% no-repeat;
 }
 
 .crt [data-line]:not([data-printed]) {
