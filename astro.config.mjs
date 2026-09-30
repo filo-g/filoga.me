@@ -8,6 +8,7 @@ const font = (name) => [`${fonts}/AnonymousPro-${name}.woff2`];
 
 // https://astro.build/config
 export default defineConfig({
+    site: "https://filoga.me",
     fonts: [{
         provider: fontProviders.local(),
         name: "Anonymous Pro",

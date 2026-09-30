@@ -7,12 +7,12 @@ import Scanlines from '../components/Scanlines.astro';
 import Console from '../components/Console.astro';
 import "../styles/global.css";
 
-const { title, description, class: className } = Astro.props;
+const { title, description, noindex, class: className } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="en">
-	<Head title={title} description={description} />
+	<Head title={title} description={description} noindex={noindex} />
 	<body class="bg-black">
 		<Header />
 		<main class:list={["relative isolate", className]}>
