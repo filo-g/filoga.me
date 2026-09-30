@@ -21,6 +21,10 @@ import { PROMPT } from "../lib/terminal";
         animation: blink 1s steps(1) infinite;
     }
 
+    .is-busy .console__cursor {
+        visibility: hidden;
+    }
+
     @keyframes blink {
         50% { opacity: 0; }
     }

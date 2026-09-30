@@ -1,6 +1,6 @@
 .screen {
     @apply relative h-screen overflow-hidden;
-    @apply bg-screen font-mono text-3xl text-phosphor;
+    @apply bg-screen font-mono text-base text-phosphor md:text-3xl;
 }
 
 .screen__content {
@@ -8,7 +8,7 @@
 }
 
 .screen__output {
-    @apply flex min-h-0 flex-1 flex-col justify-end;
+    @apply flex min-h-0 flex-1 flex-col justify-end @container;
 }
 
 .screen--lens {
@@ -30,4 +30,8 @@
     background: color-mix(in oklab, var(--glow) 22%, transparent);
     box-shadow: 0 0 3rem color-mix(in oklab, var(--glow) 10%, transparent);
     filter: blur(1rem);
+}
+
+.crt [data-line]:not([data-printed]) {
+    display: none;
 }
