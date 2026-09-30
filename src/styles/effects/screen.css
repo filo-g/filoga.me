@@ -1,4 +1,57 @@
 .screen {
-    /* @apply m-16;
-    filter: url(#screenLens); */
+    @apply relative h-screen overflow-hidden;
+    @apply bg-screen font-mono text-base text-phosphor md:text-3xl;
+}
+
+.screen__content {
+    @apply flex h-full flex-col p-8;
+}
+
+.screen__output {
+    @apply flex min-h-0 flex-1 flex-col justify-end @container;
+}
+
+.screen--lens {
+    filter: url(#screenLens);
+}
+
+.screen--tube {
+    mask: var(--tube) center / 100% 100% no-repeat;
+}
+
+/* The tube cuts 3.3% of each axis at the corners, keep text clear of it */
+.screen--tube .screen__content {
+    padding: calc(3.3vh + 1rem) calc(3.3vw + 1rem);
+}
+
+.screen-glow {
+    display: none;
+}
+
+/* Tube silhouette from the lens script, static so it's painted once */
+.screen:is(.screen--lens, .screen--tube) ~ .screen-glow {
+    @apply absolute inset-0 -z-10 block pointer-events-none;
+
+    --glow: var(--color-phosphor-glow);
+
+    filter: blur(1rem)
+        drop-shadow(0 0 2rem color-mix(in oklab, var(--glow) 25%, transparent));
+}
+
+/* Masked child, a mask on the blurred element would cut the blur off */
+.screen:is(.screen--lens, .screen--tube) ~ .screen-glow::before {
+    @apply absolute inset-0;
+
+    content: "";
+    background: color-mix(in oklab, var(--glow) 22%, transparent);
+    mask: var(--tube) center / 100% 100% no-repeat;
+}
+
+/* Fits the text so each print step reveals one character */
+[data-line] {
+    width: fit-content;
+}
+
+.crt [data-line]:not([data-printed]) {
+    display: none;
 }

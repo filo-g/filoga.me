@@ -1,4 +1,14 @@
 @import "tailwindcss";
 
+@import "./effects/phosphor.css";
+@import "./effects/power-on.css";
 @import "./effects/scanlines.css";
 @import "./effects/screen.css";
+
+@theme {
+    --font-mono: var(--font-anonymous-pro);
+
+    --color-phosphor: oklch(0.8 0.095 150);
+    --color-phosphor-glow: oklch(0.68 0.13 148);
+    --color-screen: oklch(0.17 0.012 160);
+}
