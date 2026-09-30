@@ -100,6 +100,35 @@ if (screenEl && mapX && mapY && displacement) {
         });
     };
 
+    // Hit testing ignores the lens, map pointers to the DOM point shown
+    const bent = (x: number, y: number) => {
+        const box = screenEl.getBoundingClientRect();
+        const u = ((x - box.left) / box.width) * 2 - 1;
+        const v = ((y - box.top) / box.height) * 2 - 1;
+        const r2 = u * u + v * v;
+        return document.elementFromPoint(
+            x + u * r2 * CURVATURE * (box.width / 2),
+            y + v * r2 * CURVATURE * (box.height / 2),
+        );
+    };
+    const lensOn = () => screenEl.classList.contains("screen--lens");
+    const link = (el: Element | null) => el?.closest("a") ?? null;
+
+    screenEl.addEventListener("click", (event) => {
+        // Skip our own redirected click, it has no real coordinates
+        if (!lensOn() || !event.isTrusted) return;
+        const shown = link(bent(event.clientX, event.clientY));
+        if (shown === link(event.target as Element)) return;
+        event.preventDefault();
+        event.stopPropagation();
+        shown?.click();
+    }, true);
+
+    screenEl.addEventListener("pointermove", (event) => {
+        const pointing = lensOn() && link(bent(event.clientX, event.clientY));
+        screenEl.classList.toggle("is-pointing", Boolean(pointing));
+    });
+
     new ResizeObserver(([entry]) => {
         size = entry.contentRect;
         update();

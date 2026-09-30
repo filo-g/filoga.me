@@ -1,0 +1,30 @@
+---
+import art from "../assets/not-found.txt?raw";
+import { PROMPT } from "../lib/terminal";
+import Figlet from "./Figlet.astro";
+import Session from "./Session.astro";
+---
+
+<h1 class="sr-only">404, page not found</h1>
+
+<Session command="cd">
+    <p data-line>Invalid directory</p>
+    <p data-line>&nbsp;</p>
+    <Figlet art={art} label="404 not found" />
+    <p data-line>&nbsp;</p>
+    <p data-line>Try <a href="/">cd \</a></p>
+</Session>
+
+<script is:inline define:vars={{ PROMPT }}>
+    // Static page, the missing path is only known in the browser
+    const session = document.querySelector("[data-session]");
+    const path = decodeURI(location.pathname).replaceAll("/", "\\");
+    session.dataset.command = `cd ${path}`;
+    session.querySelector("[data-echo]").textContent = PROMPT + `cd ${path}`;
+</script>
+
+<style>
+    a {
+        text-decoration: underline;
+    }
+</style>
