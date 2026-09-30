@@ -15,12 +15,21 @@
     filter: url(#screenLens);
 }
 
+.screen--tube {
+    mask: var(--tube) center / 100% 100% no-repeat;
+}
+
+/* The tube cuts 3.3% of each axis at the corners, keep text clear of it */
+.screen--tube .screen__content {
+    padding: calc(3.3vh + 1rem) calc(3.3vw + 1rem);
+}
+
 .screen-glow {
     display: none;
 }
 
 /* Tube silhouette from the lens script, static so it's painted once */
-.screen--lens ~ .screen-glow {
+.screen:is(.screen--lens, .screen--tube) ~ .screen-glow {
     @apply absolute inset-0 -z-10 block pointer-events-none;
 
     --glow: var(--color-phosphor-glow);
@@ -30,7 +39,7 @@
 }
 
 /* Masked child, a mask on the blurred element would cut the blur off */
-.screen--lens ~ .screen-glow::before {
+.screen:is(.screen--lens, .screen--tube) ~ .screen-glow::before {
     @apply absolute inset-0;
 
     content: "";
