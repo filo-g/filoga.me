@@ -1,81 +1,18 @@
 ---
-import figlet from "../assets/coming-soon.txt?raw";
-import { PROMPT, progressBar } from "../lib/terminal";
+import art from "../assets/coming-soon.txt?raw";
+import { progressBar } from "../lib/terminal";
+import Figlet from "./Figlet.astro";
+import Session from "./Session.astro";
 
-const COMMAND = "exec filoga.me";
 const STALL = 87;
 ---
 
 <h1 class="sr-only">filoga.me, portfolio coming soon</h1>
 
-<div class="coming-soon" data-coming-soon data-command={COMMAND}>
-    <p data-line data-echo>{PROMPT}{COMMAND}</p>
+<Session command="exec filoga.me">
     <p data-line>Loading filoga.me...</p>
     <p data-line data-progress={STALL}>{progressBar(STALL)}</p>
     <p data-line>Something went wrong. Error message:</p>
     <p data-line>&nbsp;</p>
-    <div class="figlet" role="img" aria-label="Coming soon">
-        {figlet.trimEnd().split("\n").map((row) => (
-            <span data-line data-speed="4">{row}</span>
-        ))}
-    </div>
-</div>
-
-<script>
-    import { busy, clear, type } from "../lib/console";
-    import { lines, print } from "../lib/printer";
-    import { screenReady } from "../lib/screen";
-    import { isMobile, progressBar, sleep } from "../lib/terminal";
-
-    const root = document.querySelector<HTMLElement>("[data-coming-soon]");
-
-    // Types the command, then prints its output line by line
-    async function run(root: HTMLElement) {
-        const mobile = isMobile();
-        const pace = mobile ? 0.4 : 0.7;
-        const [echo, ...output] = lines(root);
-
-        // Nothing runs before the screen is on
-        await screenReady();
-        if (!mobile) {
-            await sleep(600);
-            await type(root.dataset.command ?? "");
-            await sleep(300);
-            clear();
-        }
-        busy(true);
-        await print(echo, 0);
-
-        for (const line of output) {
-            await sleep(120 * pace);
-            if (line.dataset.progress) await progress(line, pace);
-            else await print(line, pace);
-        }
-        busy(false);
-    }
-
-    // Fills the bar up to the stall percent, then hangs a moment
-    async function progress(line: HTMLElement, pace: number) {
-        const stall = Number(line.dataset.progress);
-        line.setAttribute("data-printed", "");
-        for (let percent = 0; percent <= stall; percent += 3) {
-            line.textContent = progressBar(percent);
-            await sleep(45 * pace);
-        }
-        line.textContent = progressBar(stall);
-        await sleep(900 * pace);
-    }
-
-    // Without .crt (no JS, reduced motion) the final state stays as is
-    if (root && document.documentElement.classList.contains("crt")) run(root);
-</script>
-
-<style>
-    /* 60 columns of Anonymous Pro (0.546em each) fit the output width */
-    .figlet {
-        display: grid;
-        font-size: min(1em, 100cqi / 33);
-        line-height: 1.15;
-        white-space: pre;
-    }
-</style>
+    <Figlet art={art} label="Coming soon" />
+</Session>

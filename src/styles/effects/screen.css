@@ -15,6 +15,15 @@
     filter: url(#screenLens);
 }
 
+/* Pointer follows the lens, see screenLens.ts */
+.screen--lens a {
+    cursor: inherit;
+}
+
+.screen--lens.is-pointing {
+    cursor: pointer;
+}
+
 .screen--tube {
     mask: var(--tube) center / 100% 100% no-repeat;
 }
