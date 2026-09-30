@@ -4,6 +4,7 @@ import Header from './Header.astro';
 import Footer from './Footer.astro';
 import SvgFilters from './svgFilters.astro';
 import Scanlines from '../components/Scanlines.astro';
+import Console from '../components/Console.astro';
 import "../styles/global.css";
 
 const { title, description, class: className } = Astro.props;
@@ -15,8 +16,11 @@ const { title, description, class: className } = Astro.props;
 	<body class="bg-black">
 		<Header />
 		<main class:list={["relative isolate", className]}>
-			<div class="screen relative">
-				<slot />
+			<div class="screen">
+				<div class="screen__output">
+					<slot />
+				</div>
+				<Console />
 				<Scanlines />
 			</div>
 			<div class="screen-glow" aria-hidden="true"></div>

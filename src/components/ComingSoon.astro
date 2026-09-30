@@ -1,3 +1,6 @@
-<div id="coming-soon" class="relative h-screen bg-screen flex justify-center items-center">
-    <code class="absolute bottom-0 left-0 text-3xl text-phosphor p-8">&gt;_ exec filoga.me<br>Command not found. Error message: coming_soon...</code>
-</div>
+---
+import { PROMPT } from "../lib/terminal";
+---
+
+<p>{PROMPT}exec filoga.me</p>
+<p>Command not found. Error message: coming_soon...</p>

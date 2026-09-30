@@ -1,0 +1,33 @@
+---
+import { PROMPT } from "../lib/terminal";
+---
+
+<div class="console hidden md:flex" aria-hidden="true">
+    <span>{PROMPT}</span>
+    <span class="console__input" data-console-input></span>
+    <span class="console__cursor"></span>
+</div>
+
+<style>
+    .console__input {
+        white-space: pre;
+    }
+
+    .console__cursor {
+        --bar: transparent 78%, currentColor 78% 90%, transparent 90%;
+
+        width: 1ch;
+        background: linear-gradient(var(--bar));
+        animation: blink 1s steps(1) infinite;
+    }
+
+    @keyframes blink {
+        50% { opacity: 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .console__cursor {
+            animation: none;
+        }
+    }
+</style>
