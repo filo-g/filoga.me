@@ -1,3 +1,18 @@
-<div id="coming-soon" class="relative h-screen bg-black flex justify-center items-center">
-    <code class="absolute bottom-0 left-0 text-3xl text-lime-500 p-8">&gt;_ exec filoga.me<br>Command not found. Error message: coming_soon...</code>
-</div>
+---
+import art from "../assets/coming-soon.txt?raw";
+import { progressBar } from "../lib/terminal";
+import Figlet from "./Figlet.astro";
+import Session from "./Session.astro";
+
+const STALL = 87;
+---
+
+<h1 class="sr-only">filoga.me, portfolio coming soon</h1>
+
+<Session command="exec filoga.me">
+    <p data-line>Loading filoga.me...</p>
+    <p data-line data-progress={STALL}>{progressBar(STALL)}</p>
+    <p data-line>Something went wrong. Error message:</p>
+    <p data-line>&nbsp;</p>
+    <Figlet art={art} label="Coming soon" />
+</Session>

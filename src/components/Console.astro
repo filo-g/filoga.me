@@ -1,0 +1,40 @@
+---
+import { PROMPT } from "../lib/terminal";
+---
+
+<div class="console hidden md:flex" aria-hidden="true">
+    <span>{PROMPT}</span>
+    <span class="console__input" data-console-input></span>
+    <span class="console__cursor"></span>
+</div>
+
+<style>
+    .console__input {
+        white-space: pre;
+    }
+
+    .console__cursor {
+        --bar: transparent 78%, currentColor 78% 90%, transparent 90%;
+
+        width: 1ch;
+        background: linear-gradient(var(--bar));
+    }
+
+    .console__cursor.is-off {
+        opacity: 0;
+    }
+
+    .is-busy .console__cursor {
+        visibility: hidden;
+    }
+</style>
+
+<script>
+    // Blinks from JS: a CSS animation would recompute the lens every frame
+    const cursor = document.querySelector(".console__cursor");
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+
+    if (cursor && !reduce.matches) {
+        setInterval(() => cursor.classList.toggle("is-off"), 500);
+    }
+</script>

@@ -1,0 +1,13 @@
+.crt .screen {
+    --glow: var(--color-phosphor-glow);
+
+    text-shadow:
+        0 0 0.15em color-mix(in oklab, var(--glow) 35%, transparent),
+        0 0 0.6em color-mix(in oklab, var(--glow) 12%, transparent);
+}
+
+.screen ::selection {
+    background: var(--color-phosphor);
+    color: var(--color-screen);
+    text-shadow: none;
+}

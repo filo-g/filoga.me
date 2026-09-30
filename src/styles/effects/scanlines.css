@@ -1,25 +1,46 @@
-.scanlines {
-    @apply absolute inset-0 z-10 pointer-events-none;
-
-    background:
-        linear-gradient(
-            transparent 50%,
-            color-mix(in oklab, oklch(0.8736 0.2946 142.6) 3%, transparent) 50%
-        ),
-        linear-gradient(
-            90deg,
-            transparent 50%,
-            color-mix(in oklab, oklch(0.6279 0.2578 29.1) 1%, transparent) 50%
-        );
-    background-size: 100% 0.5rem, 0.5rem 100%;
-    animation: scanlines 0.1s linear infinite;
+.scanlines,
+.refresh-band {
+    display: none;
 }
 
-@keyframes scanlines {
-    0% {
-        transform: translateY(0rem);
-    }
-    100% {
-        transform: translateY(0.5rem);
-    }
+.crt .scanlines {
+    @apply absolute inset-0 z-10 block pointer-events-none;
+
+    background:
+        radial-gradient(transparent 65%, rgb(0 0 0 / 0.2) 100%),
+        repeating-linear-gradient(transparent 0 2px, rgb(0 0 0 / 0.12) 2px 3px);
+}
+
+.crt .refresh-band {
+    @apply absolute inset-0 z-10 block overflow-hidden pointer-events-none;
+}
+
+.crt .refresh-band::before {
+    @apply absolute inset-x-0 h-1/4;
+
+    --band: color-mix(in oklab, var(--color-phosphor-glow) 4%, transparent);
+
+    content: "";
+    top: -25%;
+    background: linear-gradient(transparent, var(--band) 50%, transparent);
+    animation: refresh-band 8s linear infinite;
+}
+
+@keyframes refresh-band {
+    to { transform: translateY(500%); }
+}
+
+/* Outside the lens so it doesn't recompute the filter */
+.crt main {
+    animation: flicker 6s steps(1) infinite;
+}
+
+@keyframes flicker {
+    0%, 100% { opacity: 1; }
+    12% { opacity: 0.985; }
+    13% { opacity: 1; }
+    47% { opacity: 0.975; }
+    48% { opacity: 1; }
+    71% { opacity: 0.99; }
+    73% { opacity: 1; }
 }

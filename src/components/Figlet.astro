@@ -1,0 +1,29 @@
+---
+interface Props {
+    art: string;
+    label: string;
+}
+
+const { art, label } = Astro.props;
+const rows = art.trimEnd().split("\n");
+const columns = Math.max(...rows.map((row) => row.length));
+---
+
+<div
+    class="figlet"
+    role="img"
+    aria-label={label}
+    style={`--columns: ${columns}`}
+>
+    {rows.map((row) => <span data-line data-speed="4">{row}</span>)}
+</div>
+
+<style>
+    /* Anonymous Pro characters are 0.546em wide */
+    .figlet {
+        display: grid;
+        font-size: min(1em, 100cqi / (var(--columns) * 0.546));
+        line-height: 1.15;
+        white-space: pre;
+    }
+</style>
