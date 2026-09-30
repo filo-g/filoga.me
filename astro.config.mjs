@@ -2,15 +2,16 @@
 import { defineConfig, fontProviders } from 'astro/config';
 import tailwindcss from "@tailwindcss/vite";
 
-const fonts = "./src/assets/fonts/space-mono";
-const font = (name) => [`${fonts}/SpaceMono-${name}.woff2`];
+const fonts = "./src/assets/fonts/anonymous-pro";
+/** @type {(name: string) => [string]} */
+const font = (name) => [`${fonts}/AnonymousPro-${name}.woff2`];
 
 // https://astro.build/config
 export default defineConfig({
     fonts: [{
         provider: fontProviders.local(),
-        name: "Space Mono",
-        cssVariable: "--font-space-mono",
+        name: "Anonymous Pro",
+        cssVariable: "--font-anonymous-pro",
         fallbacks: ["monospace"],
         options: {
             variants: [

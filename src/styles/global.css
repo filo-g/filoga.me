@@ -6,7 +6,7 @@
 @import "./effects/screen.css";
 
 @theme {
-    --font-mono: var(--font-space-mono);
+    --font-mono: var(--font-anonymous-pro);
 
     --color-phosphor: oklch(0.8 0.095 150);
     --color-phosphor-glow: oklch(0.68 0.13 148);
