@@ -12,7 +12,11 @@ export function print(el: HTMLElement, pace = 1) {
 
     return el
         .animate(
-            [{ clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0)" }],
+            // Only the right edge moves, the glow overflows the other ones
+            [
+                { clipPath: "inset(-1em 100% -1em -1em)" },
+                { clipPath: "inset(-1em 0 -1em -1em)" },
+            ],
             { duration: chars * msPerChar, easing: `steps(${chars})` },
         )
         .finished.then(() => {});

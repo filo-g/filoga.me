@@ -38,6 +38,11 @@
     mask: var(--tube) center / 100% 100% no-repeat;
 }
 
+/* Fits the text so each print step reveals one character */
+[data-line] {
+    width: fit-content;
+}
+
 .crt [data-line]:not([data-printed]) {
     display: none;
 }
