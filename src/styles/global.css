@@ -12,3 +12,11 @@
     --color-phosphor-glow: oklch(0.68 0.13 148);
     --color-screen: oklch(0.17 0.012 160);
 }
+
+/* Desktop is one view laid out at 1440×900 that scales with the window:
+   16px there, whichever axis is tighter decides */
+@media (width >= 48rem) {
+    html {
+        font-size: min(100vw / 90, 100vh / 56.25);
+    }
+}
