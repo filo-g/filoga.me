@@ -1,10 +1,11 @@
+/* Mobile grows and scrolls natively, desktop is a single fixed view */
 .screen {
-    @apply relative h-screen overflow-hidden;
+    @apply relative min-h-screen md:h-screen md:overflow-hidden;
     @apply bg-screen font-mono text-base text-phosphor md:text-3xl;
 }
 
 .screen__content {
-    @apply flex h-full flex-col p-8;
+    @apply flex min-h-screen flex-col p-8 md:h-full md:min-h-0;
 
     /* Room for the fixed section bar */
     @apply max-md:pb-24;

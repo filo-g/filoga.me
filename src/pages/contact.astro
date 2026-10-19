@@ -1,0 +1,55 @@
+---
+import Session from "../components/Session.astro";
+import Root from "../layouts/Root.astro";
+
+const email = "yo@filoga.me";
+const github = "filo-g";
+const channels = [
+    { label: "Email", value: email, href: `mailto:${email}` },
+    {
+        label: "GitHub",
+        value: `github.com/${github}`,
+        href: `https://github.com/${github}`,
+    },
+];
+const description =
+    "Get in touch with Rodrigo (Filo), full stack web developer in " +
+    "Málaga, Spain. Email and GitHub.";
+---
+
+<Root
+    title="Contact"
+    description={description}
+>
+    <h1 class="sr-only">Contact</h1>
+    <Session command="cd contact">
+        <dl class="channels">
+            {channels.map((channel) => (
+                <div>
+                    <dt>{channel.label}</dt>
+                    <dd><a href={channel.href}>{channel.value}</a></dd>
+                </div>
+            ))}
+        </dl>
+    </Session>
+</Root>
+
+<style>
+    @reference "../styles/global.css";
+
+    .channels {
+        @apply grid gap-[0.5lh];
+    }
+
+    .channels div {
+        @apply flex flex-col md:flex-row md:items-baseline md:gap-[2ch];
+    }
+
+    .channels dt {
+        @apply text-sm opacity-75 md:w-[6ch] md:text-xl;
+    }
+
+    .channels dd {
+        @apply text-xl break-all md:text-4xl;
+    }
+</style>

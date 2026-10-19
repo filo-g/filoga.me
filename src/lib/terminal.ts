@@ -17,10 +17,3 @@ export const isMobile = () => matchMedia("(max-width: 47.999rem)").matches;
 // Page path without the .html of the file build, /about.html → /about
 export const cleanPath = (path: string) =>
     path.replace(/(\/index)?\.html$/, "").replace(/(.)\/$/, "$1") || "/";
-
-// Text progress bar, e.g. [#####.....]  50%
-export function progressBar(percent: number, width = 20) {
-    const filled = Math.round((percent / 100) * width);
-    const bar = "#".repeat(filled) + ".".repeat(width - filled);
-    return `[${bar}] ${String(percent).padStart(3)}%`;
-}
