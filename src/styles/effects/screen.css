@@ -5,6 +5,9 @@
 
 .screen__content {
     @apply flex h-full flex-col p-8;
+
+    /* Room for the fixed section bar */
+    @apply max-md:pb-24;
 }
 
 .screen__output {
