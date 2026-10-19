@@ -56,11 +56,17 @@
     mask: var(--tube) center / 100% 100% no-repeat;
 }
 
-/* Fits the text so each print step reveals one character */
-[data-line] {
-    width: fit-content;
+/* Content waits under the curtain, see curtain.ts */
+.crt [data-session]:not([data-revealed]) {
+    clip-path: inset(0 0 100% 0);
 }
 
-.crt [data-line]:not([data-printed]) {
-    display: none;
+:where(.screen) a {
+    text-decoration: underline;
+}
+
+/* Focus as a fill, hairline outlines break up under the lens */
+:where(.screen) :is(a, button):focus-visible {
+    outline: none;
+    background: color-mix(in oklab, var(--color-phosphor) 30%, transparent);
 }

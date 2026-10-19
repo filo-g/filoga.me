@@ -1,63 +1,64 @@
 ---
+import domain from "../assets/filoga-me.txt?raw";
 import { PROMPT } from "../lib/terminal";
+import Figlet from "./Figlet.astro";
 
 interface Props {
-    command: string;
+    command?: string;
+    prompt?: string;
+    // Banner figlet, the domain unless a page sets its own or none
+    art?: string | false;
+    label?: string;
 }
 
-const { command } = Astro.props;
+const {
+    command,
+    prompt = PROMPT,
+    art = domain,
+    label = "filoga.me",
+} = Astro.props;
 ---
 
 <div data-session data-command={command}>
-    <p data-line data-echo>{PROMPT}{command}</p>
+    {command && <p data-echo aria-hidden="true">{prompt}{command}</p>}
+    <!-- Before the banner so it can float beside it -->
+    <slot name="aside" />
+    {art && <Figlet art={art} label={label} />}
+    {art && <p aria-hidden="true">&nbsp;</p>}
     <slot />
 </div>
 
 <script>
     import { busy, clear, type } from "../lib/console";
-    import { lines, print } from "../lib/printer";
+    import { reveal } from "../lib/curtain";
     import { screenReady } from "../lib/screen";
-    import { isMobile, progressBar, sleep } from "../lib/terminal";
+    import { isMobile, sleep } from "../lib/terminal";
 
     const root = document.querySelector<HTMLElement>("[data-session]");
 
-    // Types the command, then prints its output line by line
+    // Types the command, then lifts the curtain over its output
     async function run(root: HTMLElement) {
         const mobile = isMobile();
-        const pace = mobile ? 0.4 : 0.7;
-        const [echo, ...output] = lines(root);
+        const command = root.dataset.command;
 
         // Nothing runs before the screen is on
         await screenReady();
-        if (!mobile) {
+        if (command && !mobile) {
             await sleep(600);
-            await type(root.dataset.command ?? "");
+            await type(command);
             await sleep(300);
             clear();
         }
         busy(true);
-        await print(echo, 0);
-
-        for (const line of output) {
-            await sleep(120 * pace);
-            if (line.dataset.progress) await progress(line, pace);
-            else await print(line, pace);
-        }
+        // Mobile scrolls natively, rows pushing up would land off screen
+        await reveal(
+            root,
+            mobile ? 900 : 1500,
+            mobile ? {} : { scroll: true, bands: 6 },
+        );
         busy(false);
     }
 
-    // Fills the bar up to the stall percent, then hangs a moment
-    async function progress(line: HTMLElement, pace: number) {
-        const stall = Number(line.dataset.progress);
-        line.setAttribute("data-printed", "");
-        for (let percent = 0; percent <= stall; percent += 3) {
-            line.textContent = progressBar(percent);
-            await sleep(45 * pace);
-        }
-        line.textContent = progressBar(stall);
-        await sleep(900 * pace);
-    }
-
-    // Without .crt (no JS, reduced motion) the final state stays as is
+    // Without .crt (no JS, reduced motion) the content shows as is
     if (root && document.documentElement.classList.contains("crt")) run(root);
 </script>
