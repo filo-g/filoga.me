@@ -1,0 +1,135 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { Image } from "astro:assets";
+
+interface Props {
+    projects: CollectionEntry<"projects">[];
+    current: CollectionEntry<"projects">;
+    // h1 on the project's own page, h2 under the projects heading
+    heading?: "h1" | "h2";
+}
+
+const { projects, current, heading: Heading = "h2" } = Astro.props;
+const { title, year, type, summary, stack, url, repo, images } =
+    current.data;
+---
+
+<div class="projects">
+    <!-- data-cycle: arrow keys step through it, see Console.astro -->
+    <nav class="list" aria-label="Projects" data-cycle>
+        <ul>
+            {projects.map(({ id, data }) => (
+                <li>
+                    <a
+                        href={`/projects/${id}`}
+                        aria-current={id === current.id ? "page" : undefined}
+                    >
+                        <span class="name">{data.title}</span>
+                        <span class="meta">{data.year} · {data.type}</span>
+                    </a>
+                </li>
+            ))}
+        </ul>
+        <p class="tip">↑↓ to browse</p>
+    </nav>
+    <article class="detail">
+        <header>
+            <Heading>{title}</Heading>
+            <p class="meta">{year} · {type}</p>
+        </header>
+        <p class="summary">{summary}</p>
+        <ul class="tags" aria-label="Stack">
+            {stack.map((tech) => <li>{tech}</li>)}
+        </ul>
+        <p class="links">
+            {url && <a href={url}>Visit site ↗</a>}
+            {repo && <a href={repo}>Source ↗</a>}
+        </p>
+        <div class="shots">
+            {images.map((shot) => (
+                <Image src={shot.src} alt={shot.alt} width={800} />
+            ))}
+        </div>
+    </article>
+</div>
+
+<style>
+    @reference "../styles/global.css";
+
+    .projects {
+        @apply grid gap-y-[1lh] md:grid-cols-[minmax(12ch,auto)_1fr];
+        @apply md:gap-x-[3ch];
+    }
+
+    /* List: name over its year and type, current one lit */
+    .list ul {
+        @apply grid gap-[0.25lh];
+    }
+
+    .list a {
+        @apply block py-[0.15lh] pl-[1.5ch];
+        @apply no-underline;
+    }
+
+    /* Fills, not borders: hairlines break up under the lens */
+    .list a:hover {
+        @apply bg-phosphor/5;
+    }
+
+    .list a[aria-current] {
+        @apply bg-phosphor/15;
+    }
+
+    .list .name {
+        @apply block text-xl font-bold md:text-2xl;
+    }
+
+    .list .meta,
+    .list .tip {
+        @apply block text-sm opacity-75 md:text-base;
+    }
+
+    .list .tip {
+        @apply mt-[1lh] hidden md:block;
+    }
+
+    :global(.keys-off) .list .tip {
+        @apply hidden;
+    }
+
+    /* Detail: big title, summary, tags, then the shots */
+    .detail {
+        @apply grid content-start gap-[0.6lh] text-lg md:text-xl;
+    }
+
+    .detail :is(h1, h2) {
+        @apply text-3xl font-bold md:text-5xl;
+    }
+
+    .detail header .meta {
+        @apply opacity-75;
+    }
+
+    .tags {
+        @apply flex flex-wrap gap-[1ch] text-sm md:text-base;
+    }
+
+    .tags li {
+        @apply bg-phosphor/15 px-[1ch];
+    }
+
+    .links {
+        @apply flex gap-[3ch];
+    }
+
+    .shots {
+        @apply grid grid-cols-2 gap-[1.5ch];
+    }
+
+    .shots img {
+        @apply aspect-[16/10] h-auto w-full object-cover;
+
+        /* Leaves room for the banner and the list on short screens */
+        max-height: 22vh;
+    }
+</style>

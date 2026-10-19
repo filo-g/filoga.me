@@ -1,15 +1,19 @@
-export const PROMPT = "F:\\WEB>";
+// Directory under F:\WEB, e.g. F:\WEB\PROJECTS
+export const path = (dir = "") =>
+    `F:\\WEB${dir && `\\${dir.toUpperCase()}`}`;
+
+// Prompt in that directory, e.g. F:\WEB\PROJECTS>
+export const prompt = (dir = "") => `${path(dir)}>`;
+
+export const PROMPT = prompt();
 
 // Waits the given milliseconds
 export const sleep = (ms: number) =>
     new Promise<void>((resolve) => setTimeout(resolve, ms));
 
-// Below md: no console, no lens, faster prints
+// Below md: no console, no lens, faster reveal
 export const isMobile = () => matchMedia("(max-width: 47.999rem)").matches;
 
-// Text progress bar, e.g. [#####.....]  50%
-export function progressBar(percent: number, width = 20) {
-    const filled = Math.round((percent / 100) * width);
-    const bar = "#".repeat(filled) + ".".repeat(width - filled);
-    return `[${bar}] ${String(percent).padStart(3)}%`;
-}
+// Page path without the .html of the file build, /about.html → /about
+export const cleanPath = (path: string) =>
+    path.replace(/(\/index)?\.html$/, "").replace(/(.)\/$/, "$1") || "/";

@@ -1,12 +1,142 @@
 ---
-import ComingSoon from '../components/ComingSoon.astro';
-import Root from '../layouts/Root.astro';
+import { Image } from "astro:assets";
+import profile from "../assets/profile.jpeg";
+import Session from "../components/Session.astro";
+import Root from "../layouts/Root.astro";
+
+// System info card, neofetch style
+const info = [
+    { key: "Role", value: "Full stack web developer & SpecOps" },
+    { key: "Base", value: "Málaga, Spain" },
+    { key: "Uptime", value: "5+ years" },
+    { key: "Shipped", value: "50+ projects" },
+    { key: "Stack", value: "Astro · TypeScript · Tailwind · Cloudflare" },
+];
+// Who this site is about, for search engines
+const person = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: "Rodrigo",
+    alternateName: "Filo",
+    jobTitle: "Full stack web developer",
+    url: "https://filoga.me",
+    email: "mailto:yo@filoga.me",
+    address: {
+        "@type": "PostalAddress",
+        addressLocality: "Málaga",
+        addressCountry: "ES",
+    },
+    sameAs: ["https://github.com/filo-g"],
+};
+// Phosphor shades for the palette row
+const shades = [15, 25, 35, 50, 65, 80, 90, 100];
+const description =
+    "Rodrigo (Filo), full stack web developer based in Málaga, Spain. " +
+    "5+ years and 50+ projects shipped, from custom WordPress to " +
+    "Payload and Astro sites.";
 ---
 
-<Root 
-	title="exec filoga.me"
-	description="Command executed. Loading portfolio..."
-    class=""
+<Root
+    title="Rodrigo (Filo), full stack web developer in Málaga"
+    description={description}
+    schema={person}
 >
-	<ComingSoon />
+    <Session command="exec filoga.me" art={false}>
+        <div class="fetch">
+            <div class="portrait">
+                <Image
+                    src={profile}
+                    alt="Portrait of Rodrigo"
+                    loading="eager"
+                    fetchpriority="high"
+                />
+            </div>
+            <div class="card">
+                <h1 class="who">
+                    <span aria-hidden="true"><b>rodrigo</b>@filoga.me</span>
+                    <span class="sr-only">
+                        Rodrigo, full stack web developer
+                    </span>
+                </h1>
+                <p class="rule" aria-hidden="true">{"-".repeat(17)}</p>
+                <dl>
+                    {info.map((item) => (
+                        <div>
+                            <dt>{item.key}</dt>
+                            <dd>{item.value}</dd>
+                        </div>
+                    ))}
+                </dl>
+                <p class="palette" aria-hidden="true">
+                    {shades.map((shade) => (
+                        <span style={`--shade: ${shade}%`}></span>
+                    ))}
+                </p>
+            </div>
+        </div>
+    </Session>
 </Root>
+
+<style>
+    @reference "../styles/global.css";
+
+    .fetch {
+        @apply grid items-center gap-[1lh] md:grid-cols-[auto_1fr];
+        @apply md:gap-x-[4ch] md:text-2xl;
+    }
+
+    /* Phosphor tinted until the ASCII shader takes over */
+    .portrait {
+        @apply relative w-1/2 md:w-[11em];
+    }
+
+    .portrait :global(img) {
+        @apply aspect-square h-auto w-full object-cover;
+
+        filter: grayscale(1) contrast(1.15) brightness(0.9);
+    }
+
+    .portrait::after {
+        @apply absolute inset-0 bg-phosphor mix-blend-multiply;
+
+        content: "";
+    }
+
+    .who {
+        @apply text-xl md:text-3xl;
+    }
+
+    .who b {
+        @apply font-bold;
+    }
+
+    .rule {
+        @apply opacity-50;
+    }
+
+    dl {
+        @apply grid grid-cols-[auto_1fr] gap-x-[2ch];
+    }
+
+    dl > div {
+        @apply col-span-2 grid grid-cols-subgrid;
+    }
+
+    dt {
+        @apply font-bold;
+    }
+
+    .palette {
+        @apply mt-[0.75lh] flex;
+    }
+
+    .palette span {
+        @apply h-[1lh] w-[2.5ch];
+
+        background: color-mix(
+            in oklab,
+            var(--color-phosphor) var(--shade),
+            transparent
+        );
+    }
+</style>

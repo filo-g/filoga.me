@@ -1,5 +1,9 @@
 // @ts-check
-import { defineConfig, fontProviders } from 'astro/config';
+import {
+    defineConfig,
+    fontProviders,
+    passthroughImageService,
+} from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 
 const fonts = "./src/assets/fonts/anonymous-pro";
@@ -9,6 +13,9 @@ const font = (name) => [`${fonts}/AnonymousPro-${name}.woff2`];
 // https://astro.build/config
 export default defineConfig({
     site: "https://filoga.me",
+    // about.html, served by Cloudflare Pages at /about without a redirect
+    trailingSlash: "never",
+    build: { format: "file" },
     fonts: [{
         provider: fontProviders.local(),
         name: "Anonymous Pro",
@@ -23,6 +30,8 @@ export default defineConfig({
             ],
         },
     }],
+    // No sharp, images ship as authored
+    image: { service: passthroughImageService() },
     vite: {
         plugins: [tailwindcss()],
     },

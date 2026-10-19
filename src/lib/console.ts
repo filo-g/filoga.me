@@ -11,7 +11,7 @@ export async function type(command: string) {
 
     for (const char of command) {
         el.textContent += char;
-        await sleep(45 + Math.random() * 70);
+        await sleep(35 + Math.random() * 55);
     }
 }
 

@@ -1,0 +1,21 @@
+---
+import ProjectsView from "../../components/ProjectsView.astro";
+import Session from "../../components/Session.astro";
+import Root from "../../layouts/Root.astro";
+import { projects } from "../../lib/projects";
+
+const all = await projects();
+const description =
+    "Selected projects by Rodrigo (Filo), full stack web developer in " +
+    "Málaga, Spain.";
+---
+
+<Root
+    title="Projects"
+    description={description}
+>
+    <h1 class="sr-only">Projects</h1>
+    <Session command="cd projects">
+        <ProjectsView projects={all} current={all[0]} />
+    </Session>
+</Root>

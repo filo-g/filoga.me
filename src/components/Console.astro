@@ -1,14 +1,79 @@
 ---
-import { PROMPT } from "../lib/terminal";
+import { SECTIONS } from "../lib/sections";
+import { cleanPath } from "../lib/terminal";
+
+interface Props {
+    // Where the prompt stands, the page URL unless set
+    path?: string;
+}
+
+const { path = Astro.url.pathname } = Astro.props;
+const parts = cleanPath(path).split("/").filter(Boolean);
+// F:\WEB\PROJECTS\CHARLIE>, each directory links to its page
+const crumbs = [
+    { label: "F:\\WEB", name: "Home", href: "/" },
+    ...parts.map((part, i) => ({
+        label: part.toUpperCase(),
+        name: part[0].toUpperCase() + part.slice(1),
+        href: `/${parts.slice(0, i + 1).join("/")}`,
+    })),
+];
+const section = `/${parts[0] ?? ""}`;
 ---
 
-<div class="console hidden md:flex" aria-hidden="true">
-    <span>{PROMPT}</span>
-    <span class="console__input" data-console-input></span>
-    <span class="console__cursor"></span>
+<div class="console">
+    <nav class="console__prompt" aria-label="Breadcrumb">
+        {crumbs.map((crumb, i) => (
+            <>
+                {i > 0 && "\\"}
+                <a
+                    href={crumb.href}
+                    aria-label={crumb.name}
+                    aria-current={i === crumbs.length - 1 ? "page" : undefined}
+                >
+                    {crumb.label}
+                </a>
+            </>
+        ))}&gt;
+    </nav>
+    <span class="console__input" data-console-input aria-hidden="true"></span>
+    <span class="console__cursor" aria-hidden="true"></span>
+    <nav class="keys" aria-label="Sections">
+        {SECTIONS.map((item, i) => (
+            <a
+                href={item.href}
+                aria-current={item.href === section ? "page" : undefined}
+                data-key={i + 1}
+            >
+                <kbd>{i + 1}</kbd>{item.label}
+            </a>
+        ))}
+    </nav>
 </div>
 
 <style>
+    @reference "../styles/global.css";
+
+    /* Set apart from the output by space alone */
+    .console {
+        @apply flex items-baseline md:mt-[1.25lh];
+    }
+
+    /* Mobile has no console, only the section bar */
+    .console__prompt,
+    .console__input,
+    .console__cursor {
+        @apply hidden md:inline;
+    }
+
+    .console a {
+        text-decoration: none;
+    }
+
+    .console a:hover {
+        text-decoration: underline;
+    }
+
     .console__input {
         white-space: pre;
     }
@@ -17,6 +82,7 @@ import { PROMPT } from "../lib/terminal";
         --bar: transparent 78%, currentColor 78% 90%, transparent 90%;
 
         width: 1ch;
+        align-self: stretch;
         background: linear-gradient(var(--bar));
     }
 
@@ -26,6 +92,27 @@ import { PROMPT } from "../lib/terminal";
 
     .is-busy .console__cursor {
         visibility: hidden;
+    }
+
+    /* Function key bar, fixed tab bar on mobile */
+    .keys {
+        @apply fixed inset-x-0 bottom-0 z-10 flex justify-around;
+        @apply border-t border-phosphor/30 bg-screen py-3;
+        @apply md:static md:ml-auto md:gap-[2ch] md:border-0 md:p-0;
+        @apply md:bg-transparent md:text-xl;
+    }
+
+    .keys kbd {
+        @apply mr-[0.5ch] bg-phosphor px-[0.5ch] font-mono text-screen;
+    }
+
+    .keys a[aria-current] {
+        @apply bg-phosphor/20;
+    }
+
+    /* Shortcuts off, the keys are just labels */
+    .keys-off .keys kbd {
+        @apply bg-phosphor/30;
     }
 </style>
 
@@ -37,4 +124,47 @@ import { PROMPT } from "../lib/terminal";
     if (cursor && !reduce.matches) {
         setInterval(() => cursor.classList.toggle("is-off"), 500);
     }
+
+    const go = (link?: Element | null) => {
+        if (link instanceof HTMLAnchorElement) location.href = link.href;
+    };
+    const steps: Record<string, number> = {
+        ArrowDown: 1,
+        j: 1,
+        ArrowUp: -1,
+        k: -1,
+    };
+
+    // Shortcuts can be turned off (WCAG 2.1.4), settings will set "keys"
+    const enabled = (() => {
+        try {
+            return localStorage.getItem("keys") !== "off";
+        } catch {
+            return true;
+        }
+    })();
+    document.documentElement.classList.toggle("keys-off", !enabled);
+
+    // 1-4 sections, Esc one directory up, arrows cycle lists
+    addEventListener("keydown", (event) => {
+        if (!enabled) return;
+        if (event.metaKey || event.ctrlKey || event.altKey) return;
+        const target = event.target as Element;
+        if (target.closest("input, textarea, [contenteditable]")) return;
+
+        const key = document.querySelector(`.keys [data-key="${event.key}"]`);
+        if (key) return go(key);
+
+        if (event.key === "Escape") {
+            return go([...document.querySelectorAll(".console__prompt a")]
+                .at(-2));
+        }
+
+        const list = [...document.querySelectorAll("[data-cycle] a")];
+        const step = steps[event.key];
+        if (!step || !list.length) return;
+        event.preventDefault();
+        const at = list.findIndex((link) => link.ariaCurrent);
+        go(list[(at + step + list.length) % list.length]);
+    });
 </script>

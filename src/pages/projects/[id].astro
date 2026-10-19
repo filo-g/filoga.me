@@ -1,0 +1,25 @@
+---
+import ProjectsView from "../../components/ProjectsView.astro";
+import Session from "../../components/Session.astro";
+import Root from "../../layouts/Root.astro";
+import { projects } from "../../lib/projects";
+import { prompt } from "../../lib/terminal";
+
+export async function getStaticPaths() {
+    const all = await projects();
+    return all.map((project) => ({
+        params: { id: project.id },
+        props: { all, project },
+    }));
+}
+
+const { all, project } = Astro.props;
+const { title, summary } = project.data;
+const command = `cd ${project.id}`;
+---
+
+<Root title={`${title}, project`} description={summary}>
+    <Session command={command} prompt={prompt("projects")}>
+        <ProjectsView projects={all} current={project} heading="h1" />
+    </Session>
+</Root>

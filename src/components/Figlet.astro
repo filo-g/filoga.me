@@ -15,7 +15,7 @@ const columns = Math.max(...rows.map((row) => row.length));
     aria-label={label}
     style={`--columns: ${columns}`}
 >
-    {rows.map((row) => <span data-line data-speed="4">{row}</span>)}
+    {rows.map((row) => <span>{row}</span>)}
 </div>
 
 <style>
