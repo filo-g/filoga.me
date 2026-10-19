@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://filoga.me/sitemap.xml

@@ -13,6 +13,9 @@ const font = (name) => [`${fonts}/AnonymousPro-${name}.woff2`];
 // https://astro.build/config
 export default defineConfig({
     site: "https://filoga.me",
+    // about.html, served by Cloudflare Pages at /about without a redirect
+    trailingSlash: "never",
+    build: { format: "file" },
     fonts: [{
         provider: fontProviders.local(),
         name: "Anonymous Pro",
