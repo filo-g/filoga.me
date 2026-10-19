@@ -1,5 +1,9 @@
 // @ts-check
-import { defineConfig, fontProviders } from 'astro/config';
+import {
+    defineConfig,
+    fontProviders,
+    passthroughImageService,
+} from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 
 const fonts = "./src/assets/fonts/anonymous-pro";
@@ -23,6 +27,8 @@ export default defineConfig({
             ],
         },
     }],
+    // No sharp, images ship as authored
+    image: { service: passthroughImageService() },
     vite: {
         plugins: [tailwindcss()],
     },
