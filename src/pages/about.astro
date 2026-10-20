@@ -1,7 +1,7 @@
 ---
-import { Image } from "astro:assets";
 import art from "../assets/hi-filo.txt?raw";
 import profile from "../assets/profile.jpeg";
+import AsciiImage from "../components/AsciiImage.astro";
 import Session from "../components/Session.astro";
 import Root from "../layouts/Root.astro";
 
@@ -25,7 +25,7 @@ const description =
     <h1 class="sr-only">About</h1>
     <Session command="cd about" art={art} label="Hi, I'm Filo">
         <div slot="aside" class="portrait">
-            <Image src={profile} alt="Portrait of Rodrigo" />
+            <AsciiImage src={profile} alt="Portrait of Rodrigo" />
         </div>
         <div class="about">
             <div class="bio">
@@ -70,8 +70,7 @@ const description =
 
     /* Beside the banner on desktop, the text flows around it */
     .portrait {
-        @apply mb-[1lh] w-1/2 md:float-right md:ml-[2ch];
-        @apply md:w-[min(25%,8em)];
+        @apply mb-[1lh] w-3/4 shrink-0 md:mb-0 md:w-[min(30%,10em)];
     }
 
     .portrait :global(img) {

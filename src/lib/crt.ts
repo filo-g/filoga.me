@@ -16,3 +16,14 @@ export function bend(x: number, y: number, box: DOMRect) {
     }
     return { x: px, y: py };
 }
+
+// The content point the lens shows at (x, y), as clicks are remapped
+export function unbend(x: number, y: number, box: DOMRect) {
+    const u = ((x - box.left) / box.width) * 2 - 1;
+    const v = ((y - box.top) / box.height) * 2 - 1;
+    const r2 = u * u + v * v;
+    return {
+        x: x + u * r2 * CURVATURE * (box.width / 2),
+        y: y + v * r2 * CURVATURE * (box.height / 2),
+    };
+}
