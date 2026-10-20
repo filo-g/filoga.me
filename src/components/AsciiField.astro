@@ -1,0 +1,38 @@
+<!-- Screen background, see ascii-field.ts. Outside .screen so its frames
+     don't make the lens filter run again -->
+<canvas class="ascii-field" aria-hidden="true"></canvas>
+
+<style>
+    .ascii-field {
+        display: none;
+    }
+
+    :global(.has-field) .ascii-field {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        display: block;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+
+    /* Same tube silhouette as the screen it sits behind */
+    :global(.has-field:has(.screen--lens, .screen--tube)) .ascii-field {
+        mask: var(--tube) center / 100% 100% no-repeat;
+    }
+</style>
+
+<script>
+    import { asciiField } from "../lib/ascii-field";
+
+    const canvas = document.querySelector<HTMLCanvasElement>(".ascii-field");
+    const screen = document.querySelector<HTMLElement>(".screen");
+    const root = document.documentElement;
+
+    // No JS or reduced motion keep the plain screen background
+    if (canvas && screen && root.classList.contains("crt")) {
+        root.classList.add("has-field");
+        asciiField(canvas, screen);
+    }
+</script>

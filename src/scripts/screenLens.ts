@@ -1,5 +1,5 @@
-// Fraction of the screen displaced at the corners
-const CURVATURE = 0.035;
+import { CURVATURE } from "../lib/crt";
+
 const MAP_RESOLUTION = 0.25;
 const TUBE_RESOLUTION = 0.5;
 
