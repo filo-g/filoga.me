@@ -1,5 +1,5 @@
-// Fraction of the screen displaced at the corners
-const CURVATURE = 0.035;
+import { CURVATURE } from "../lib/crt";
+
 const MAP_RESOLUTION = 0.25;
 const TUBE_RESOLUTION = 0.5;
 
@@ -35,7 +35,7 @@ function alphaMap(width: number, height: number, value: Field) {
 function buildLens(width: number, height: number) {
     const mapWidth = Math.max(2, Math.round(width * MAP_RESOLUTION));
     const mapHeight = Math.max(2, Math.round(height * MAP_RESOLUTION));
-    // Max displacement at the corners (r² = 2)
+    // Max displacement at the corners (r^2 = 2)
     const scale = 2 * CURVATURE * Math.max(width, height);
     const barrel = (axis: number, u: number, v: number, size: number) =>
         0.5 + (axis * (u * u + v * v) * CURVATURE * (size / 2)) / scale;

@@ -4,6 +4,11 @@
     @apply bg-screen font-mono text-base text-phosphor md:text-3xl;
 }
 
+/* The ASCII field paints the background behind it */
+.has-field .screen {
+    background: transparent;
+}
+
 .screen__content {
     @apply flex min-h-screen flex-col p-8 md:h-full md:min-h-0;
 

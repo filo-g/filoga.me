@@ -13,7 +13,7 @@
     --color-screen: oklch(0.17 0.012 160);
 }
 
-/* Desktop is one view laid out at 1440×900 that scales with the window:
+/* Desktop is one view laid out at 1440x900 that scales with the window:
    16px there, whichever axis is tighter decides */
 @media (width >= 48rem) {
     html {
