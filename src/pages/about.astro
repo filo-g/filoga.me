@@ -68,9 +68,9 @@ const description =
 <style>
     @reference "../styles/global.css";
 
-    /* Beside the banner on desktop, the text flows around it */
+    /* Beside the banner on desktop, about as tall as the figlet */
     .portrait {
-        @apply mb-[1lh] w-3/4 shrink-0 md:mb-0 md:w-[min(30%,10em)];
+        @apply mb-[1lh] w-3/4 shrink-0 md:mb-0 md:w-[min(30%,7em)];
     }
 
     .portrait :global(img) {
@@ -85,7 +85,7 @@ const description =
     }
 
     .bio {
-        @apply space-y-[1lh] md:text-2xl;
+        @apply space-y-[1lh] md:text-xl;
     }
 
     .stack {
