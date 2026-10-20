@@ -14,6 +14,6 @@ export const sleep = (ms: number) =>
 // Below md: no console, no lens, faster reveal
 export const isMobile = () => matchMedia("(max-width: 47.999rem)").matches;
 
-// Page path without the .html of the file build, /about.html → /about
+// Page path without the .html of the file build, /about.html to /about
 export const cleanPath = (path: string) =>
     path.replace(/(\/index)?\.html$/, "").replace(/(.)\/$/, "$1") || "/";

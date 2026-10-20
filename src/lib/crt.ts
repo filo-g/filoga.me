@@ -6,7 +6,7 @@ export const CURVATURE = 0.035;
 export function bend(x: number, y: number, box: DOMRect) {
     let px = x;
     let py = y;
-    // The lens maps shown → content, a few steps solve it backwards
+    // The lens maps shown to content, a few steps solve it backwards
     for (let i = 0; i < 4; i++) {
         const u = ((px - box.left) / box.width) * 2 - 1;
         const v = ((py - box.top) / box.height) * 2 - 1;
