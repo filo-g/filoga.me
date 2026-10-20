@@ -1,6 +1,6 @@
 ---
-import { Image } from "astro:assets";
 import profile from "../assets/profile.jpeg";
+import AsciiImage from "../components/AsciiImage.astro";
 import Session from "../components/Session.astro";
 import Root from "../layouts/Root.astro";
 
@@ -28,8 +28,13 @@ const person = {
     },
     sameAs: ["https://github.com/filo-g"],
 };
-// Phosphor shades for the palette row
-const shades = [15, 25, 35, 50, 65, 80, 90, 100];
+// Terminal palette rows, normal and bright, like neofetch prints them
+const palette = [
+    ["#2e3436", "#cc4a4a", "#5fae5f", "#c9a23f", "#4a7bc0", "#a35fb0",
+        "#3fa7a7", "#c8ccc6"],
+    ["#5a605c", "#ee7070", "#8ad68a", "#ecd06a", "#7ea6e6", "#cc8ad6",
+        "#6fd3d3", "#f2f4ef"],
+];
 const description =
     "Rodrigo (Filo), full stack web developer based in Málaga, Spain. " +
     "5+ years and 50+ projects shipped, from custom WordPress to " +
@@ -44,7 +49,7 @@ const description =
     <Session command="exec filoga.me" art={false}>
         <div class="fetch">
             <div class="portrait">
-                <Image
+                <AsciiImage
                     src={profile}
                     alt="Portrait of Rodrigo"
                     loading="eager"
@@ -67,11 +72,15 @@ const description =
                         </div>
                     ))}
                 </dl>
-                <p class="palette" aria-hidden="true">
-                    {shades.map((shade) => (
-                        <span style={`--shade: ${shade}%`}></span>
+                <div class="palette" aria-hidden="true">
+                    {palette.map((row) => (
+                        <p>
+                            {row.map((color) => (
+                                <span style={`background: ${color}`}></span>
+                            ))}
+                        </p>
                     ))}
-                </p>
+                </div>
             </div>
         </div>
     </Session>
@@ -85,21 +94,12 @@ const description =
         @apply md:gap-x-[4ch] md:text-2xl;
     }
 
-    /* Phosphor tinted until the ASCII shader takes over */
     .portrait {
-        @apply relative w-1/2 md:w-[11em];
+        @apply w-3/4 md:w-[19em];
     }
 
     .portrait :global(img) {
         @apply aspect-square h-auto w-full object-cover;
-
-        filter: grayscale(1) contrast(1.15) brightness(0.9);
-    }
-
-    .portrait::after {
-        @apply absolute inset-0 bg-phosphor mix-blend-multiply;
-
-        content: "";
     }
 
     .who {
@@ -127,16 +127,14 @@ const description =
     }
 
     .palette {
-        @apply mt-[0.75lh] flex;
+        @apply mt-[0.75lh];
+    }
+
+    .palette p {
+        @apply flex;
     }
 
     .palette span {
         @apply h-[1lh] w-[2.5ch];
-
-        background: color-mix(
-            in oklab,
-            var(--color-phosphor) var(--shade),
-            transparent
-        );
     }
 </style>

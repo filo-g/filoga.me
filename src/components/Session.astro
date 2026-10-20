@@ -21,9 +21,11 @@ const {
 
 <div data-session data-command={command}>
     {command && <p data-echo aria-hidden="true">{prompt}{command}</p>}
-    <!-- Before the banner so it can float beside it -->
-    <slot name="aside" />
-    {art && <Figlet art={art} label={label} />}
+    <!-- Aside first on mobile, beside the banner and centered on desktop -->
+    <div class="banner">
+        <slot name="aside" />
+        {art && <Figlet art={art} label={label} />}
+    </div>
     {art && <p aria-hidden="true">&nbsp;</p>}
     <slot />
 </div>
@@ -51,14 +53,34 @@ const {
         }
         busy(true);
         // Mobile scrolls natively, rows pushing up would land off screen
+        // Without scroll, images in the field layer follow the curtain
+        const onRow = (bottom: number) =>
+            document.dispatchEvent(
+                new CustomEvent("curtain:row", { detail: bottom }),
+            );
         await reveal(
             root,
             mobile ? 900 : 1500,
-            mobile ? {} : { scroll: true, bands: 6 },
+            mobile ? { onRow } : { scroll: true, bands: 6 },
         );
         busy(false);
+        // Images in the field layer wait for this, see ascii-field.ts
+        document.dispatchEvent(new Event("curtain:lifted"));
     }
 
     // Without .crt (no JS, reduced motion) the content shows as is
     if (root && document.documentElement.classList.contains("crt")) run(root);
 </script>
+
+<style>
+    @reference "../styles/global.css";
+
+    .banner {
+        @apply flex flex-col md:flex-row md:items-center md:gap-x-[2ch];
+    }
+
+    /* The aside goes to the right end, the figlet keeps its place */
+    .banner > :global(:not(.figlet)) {
+        @apply md:order-last md:ml-auto;
+    }
+</style>

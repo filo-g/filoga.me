@@ -32,13 +32,15 @@ interface Options {
     scroll?: boolean;
     // Fixed number of rows instead of one per line
     bands?: number;
+    // Called as each row is done, with its bottom edge on the screen
+    onRow?: (bottom: number) => void;
 }
 
 // Lifts the curtain row by row, left to right, in a fixed time
 export async function reveal(
     el: HTMLElement,
     duration: number,
-    { scroll = false, bands }: Options = {},
+    { scroll = false, bands, onRow }: Options = {},
 ) {
     const found = rows(el, bands);
     const style = getComputedStyle(el);
@@ -68,6 +70,7 @@ export async function reveal(
         );
         done.push(animation);
         await animation.finished;
+        onRow?.(el.getBoundingClientRect().top + row.bottom + below);
     }
     // Filled animations would keep repainting the lens
     done.forEach((animation) => animation.cancel());

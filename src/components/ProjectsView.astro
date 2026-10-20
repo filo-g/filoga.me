@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import { Image } from "astro:assets";
+import AsciiImage from "./AsciiImage.astro";
 
 interface Props {
     projects: CollectionEntry<"projects">[];
@@ -47,7 +47,7 @@ const { title, year, type, summary, stack, url, repo, images } =
         </p>
         <div class="shots">
             {images.map((shot) => (
-                <Image src={shot.src} alt={shot.alt} width={800} />
+                <AsciiImage src={shot.src} alt={shot.alt} width={800} />
             ))}
         </div>
     </article>
@@ -126,10 +126,10 @@ const { title, year, type, summary, stack, url, repo, images } =
         @apply grid grid-cols-2 gap-[1.5ch];
     }
 
-    .shots img {
+    .shots :global(img) {
         @apply aspect-[16/10] h-auto w-full object-cover;
 
         /* Leaves room for the banner and the list on short screens */
-        max-height: 22vh;
+        max-height: 34vh;
     }
 </style>
