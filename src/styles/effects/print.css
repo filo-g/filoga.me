@@ -1,0 +1,52 @@
+/* Printing drops the CRT: no screen, effects, console or command echo */
+@media print {
+    :root {
+        background: #fff;
+    }
+
+    body,
+    .screen,
+    .has-field .screen {
+        height: auto;
+        overflow: visible;
+        background: #fff;
+        color: #111;
+    }
+
+    .screen,
+    .screen--lens,
+    .screen--tube {
+        filter: none;
+        mask: none;
+    }
+
+    .screen__content,
+    .screen--tube .screen__content {
+        height: auto;
+        min-height: 0;
+        padding: 0;
+    }
+
+    /* On screen output sits at the bottom, a page starts at the top */
+    .screen,
+    .screen__output {
+        display: block;
+        min-height: 0;
+    }
+
+    .crt main,
+    .crt .screen {
+        animation: none;
+        text-shadow: none;
+    }
+
+    .crt [data-session] {
+        clip-path: none;
+        transform: none;
+    }
+
+    :is(.console, .scanlines, .refresh-band, .screen-glow, .power-on-beam,
+        .ascii-field, .figlet, [data-echo], [data-session] > p[aria-hidden]) {
+        display: none !important;
+    }
+}

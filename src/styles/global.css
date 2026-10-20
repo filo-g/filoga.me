@@ -4,6 +4,7 @@
 @import "./effects/power-on.css";
 @import "./effects/scanlines.css";
 @import "./effects/screen.css";
+@import "./effects/print.css";
 
 @theme {
     --font-mono: var(--font-anonymous-pro);
