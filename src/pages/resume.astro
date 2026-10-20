@@ -1,0 +1,271 @@
+---
+import Session from "../components/Session.astro";
+import Root from "../layouts/Root.astro";
+import {
+    EDUCATION,
+    EXPERIENCE,
+    LANGUAGES,
+    PERSON,
+    STACK,
+} from "../lib/profile";
+
+const description =
+    "Resume of Rodrigo (Filo), full stack web developer and DevOps in " +
+    "Málaga, Spain. Experience, education, skills and languages.";
+---
+
+<Root title="Resume" description={description}>
+    <Session command="cd resume">
+        <article class="resume">
+            <header class="head">
+                <div>
+                    <h1>
+                        {PERSON.name} {PERSON.surname}{" "}
+                        <span>({PERSON.alias})</span>
+                    </h1>
+                    <p class="role">{PERSON.role}</p>
+                </div>
+                <ul class="contact">
+                    <li>{PERSON.base}</li>
+                    <li>
+                        <a href={`mailto:${PERSON.email}`}>{PERSON.email}</a>
+                    </li>
+                    <li>
+                        <a href={`https://github.com/${PERSON.github}`}>
+                            github.com/{PERSON.github}
+                        </a>
+                    </li>
+                </ul>
+                <!-- Needs JS, shown by the script below -->
+                <button class="download" type="button" hidden>
+                    Download PDF
+                </button>
+            </header>
+
+            <div class="body">
+                <div class="main">
+                    <section>
+                        <h2>Experience</h2>
+                        {EXPERIENCE.map((job) => (
+                            <div class="job">
+                                <p class="job-head">
+                                    <b>{job.role}</b>
+                                    <span>
+                                        <a href={job.url}>{job.company}</a>
+                                    </span>
+                                    <span class="dates">
+                                        {job.start} - {job.end}
+                                    </span>
+                                </p>
+                                <ul class="points">
+                                    {job.points.map((point) => (
+                                        <li>{point}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        ))}
+                    </section>
+                    <section>
+                        <h2>Education</h2>
+                        <ul class="plain">
+                            {EDUCATION.map((item) => (
+                                <li>
+                                    <b>{item.short}</b> {item.title}
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
+                    <section>
+                        <h2>Languages</h2>
+                        <dl class="pairs">
+                            {LANGUAGES.map(([language, level]) => (
+                                <div>
+                                    <dt>{language}</dt>
+                                    <dd>{level}</dd>
+                                </div>
+                            ))}
+                        </dl>
+                    </section>
+                </div>
+                <section class="skills">
+                    <h2>Skills</h2>
+                    <dl class="pairs">
+                        {STACK.map(([area, tech]) => (
+                            <div>
+                                <dt>{area}</dt>
+                                <dd>{tech}</dd>
+                            </div>
+                        ))}
+                    </dl>
+                </section>
+            </div>
+        </article>
+    </Session>
+</Root>
+
+<style>
+    @reference "../styles/global.css";
+
+    .head {
+        @apply flex flex-wrap items-baseline gap-x-[4ch] gap-y-[0.5lh];
+    }
+
+    h1 {
+        @apply text-2xl font-bold md:text-4xl;
+    }
+
+    h1 span {
+        @apply font-normal opacity-75;
+    }
+
+    .role {
+        @apply opacity-90 md:text-xl;
+    }
+
+    .contact {
+        @apply flex flex-wrap gap-x-[3ch] text-sm md:text-lg;
+    }
+
+    .download {
+        @apply cursor-pointer bg-phosphor px-[1ch] text-screen md:ml-auto;
+        @apply md:text-lg;
+    }
+
+    .body {
+        @apply mt-[1lh] grid gap-[1lh] md:grid-cols-[3fr_2fr];
+        @apply md:gap-x-[4ch] md:text-base;
+    }
+
+    .main {
+        @apply grid content-start gap-[0.75lh];
+    }
+
+    h2 {
+        @apply mb-[0.4lh] text-sm tracking-widest uppercase opacity-75;
+        @apply md:text-base;
+    }
+
+    .job-head {
+        @apply flex flex-wrap gap-x-[2ch];
+    }
+
+    .dates {
+        @apply opacity-75;
+    }
+
+    .points {
+        @apply mt-[0.25lh] grid gap-[0.15lh];
+    }
+
+    .points li::before {
+        content: "- ";
+    }
+
+    .plain {
+        @apply grid gap-[0.15lh];
+    }
+
+    .pairs {
+        @apply grid grid-cols-[auto_1fr] gap-x-[2ch] gap-y-[0.25lh];
+    }
+
+    .pairs > div {
+        @apply col-span-2 grid grid-cols-subgrid;
+    }
+
+    .pairs dt {
+        @apply font-bold;
+    }
+
+    /* A plain one page CV: no screen, no effects, black on white */
+    @media print {
+        @page {
+            size: A4;
+            margin: 16mm 18mm;
+        }
+
+        .resume {
+            font: 10.5pt/1.45 system-ui, -apple-system, "Segoe UI", Roboto,
+                Helvetica, Arial, sans-serif;
+            color: #111;
+        }
+
+        .resume :is(a, b, dt) {
+            color: inherit;
+        }
+
+        .resume a {
+            text-decoration: none;
+        }
+
+        .head {
+            display: block;
+            border-bottom: 1pt solid #111;
+            padding-bottom: 4mm;
+        }
+
+        h1 {
+            font-size: 20pt;
+        }
+
+        /* The alias is for the site, the CV goes by the full name */
+        h1 span {
+            display: none;
+        }
+
+        .role {
+            font-size: 12pt;
+            margin-top: 1mm;
+        }
+
+        .contact {
+            font-size: 10pt;
+            margin-top: 2mm;
+        }
+
+        .download {
+            display: none;
+        }
+
+        .body {
+            display: block;
+            margin-top: 6mm;
+            font-size: inherit;
+        }
+
+        .main {
+            display: block;
+        }
+
+        section {
+            margin-bottom: 6mm;
+            break-inside: avoid;
+        }
+
+        h2 {
+            font-size: 9pt;
+            font-weight: 700;
+            opacity: 1;
+            color: #444;
+            border-bottom: 0.5pt solid #bbb;
+            padding-bottom: 1mm;
+            margin-bottom: 2.5mm;
+        }
+
+        .dates,
+        h1 span,
+        .role {
+            opacity: 1;
+            color: #444;
+        }
+    }
+</style>
+
+<script>
+    const button = document.querySelector<HTMLButtonElement>(".download");
+    if (button) {
+        button.hidden = false;
+        // The print sheet turns the page into a plain CV, saved as PDF
+        button.addEventListener("click", () => print());
+    }
+</script>

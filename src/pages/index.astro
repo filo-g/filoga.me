@@ -6,7 +6,7 @@ import Root from "../layouts/Root.astro";
 
 // System info card, neofetch style
 const info = [
-    { key: "Role", value: "Full stack web developer & SpecOps" },
+    { key: "Role", value: "Full stack web developer & DevOps" },
     { key: "Base", value: "Málaga, Spain" },
     { key: "Uptime", value: "5+ years" },
     { key: "Shipped", value: "50+ projects" },
@@ -18,7 +18,7 @@ const person = {
     "@type": "Person",
     name: "Rodrigo",
     alternateName: "Filo",
-    jobTitle: "Full stack web developer",
+    jobTitle: "Full stack web developer and DevOps",
     url: "https://filoga.me",
     email: "mailto:yo@filoga.me",
     address: {
@@ -83,6 +83,18 @@ const description =
                 </div>
             </div>
         </div>
+        <section class="intro" aria-labelledby="intro">
+            <h2 id="intro">
+                about <span aria-hidden="true">{"-".repeat(120)}</span>
+            </h2>
+            <p>
+                Web developer from Málaga, building for the web since I
+                was 18. Over 5 years and 50+ projects delivered end to
+                end, from custom WordPress themes and plugins to Payload
+                and Astro sites, and the servers and deploys behind
+                them. <a href="/about">More about me</a>
+            </p>
+        </section>
     </Session>
 </Root>
 
@@ -124,6 +136,23 @@ const description =
 
     dt {
         @apply font-bold;
+    }
+
+    .intro {
+        @apply mt-[1lh] max-w-[72ch] text-base md:text-xl;
+    }
+
+    /* Dashes run to the width of the text, like the card rule */
+    .intro h2 {
+        @apply mb-[0.25lh] overflow-hidden font-bold whitespace-nowrap;
+    }
+
+    .intro h2 span {
+        @apply font-normal opacity-50;
+    }
+
+    .intro p {
+        @apply opacity-90;
     }
 
     .palette {

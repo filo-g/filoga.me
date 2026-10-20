@@ -4,15 +4,7 @@ import profile from "../assets/profile.jpeg";
 import AsciiImage from "../components/AsciiImage.astro";
 import Session from "../components/Session.astro";
 import Root from "../layouts/Root.astro";
-
-const stack = [
-    ["Languages", "TypeScript, JavaScript, PHP, Python, Java"],
-    ["Frontend", "HTML, CSS, Astro, Tailwind CSS"],
-    ["Motion/3D", "GSAP, Three.js, Curtains.js"],
-    ["Backend", "Node.js, WordPress, Payload, MySQL"],
-    ["Mobile", "Flutter"],
-    ["DevOps", "Linux (daily driver), Docker, Git, CI/CD, Cloudflare"],
-];
+import { HOBBIES, STACK as stack } from "../lib/profile";
 const description =
     "Rodrigo (Filo), web developer in Málaga with 5+ years and 50+ " +
     "projects delivered end to end, from code to servers and deploys.";
@@ -43,6 +35,15 @@ const description =
                     deploys at <a href="https://sebcreativos.es">Seb
                     Creativos</a> and support hundreds of clients.
                 </p>
+                <section class="hobbies" aria-labelledby="hobbies">
+                    <h2 id="hobbies">
+                        off the clock{" "}
+                        <span aria-hidden="true">{"-".repeat(120)}</span>
+                    </h2>
+                    <ul>
+                        {HOBBIES.map((hobby) => <li>{hobby}</li>)}
+                    </ul>
+                </section>
             </div>
             <section class="stack" aria-labelledby="stack">
                 <h2 id="stack">Stacks and tech I am familiar with</h2>
@@ -68,9 +69,9 @@ const description =
 <style>
     @reference "../styles/global.css";
 
-    /* Beside the banner on desktop, the text flows around it */
+    /* Beside the banner on desktop, about as tall as the figlet */
     .portrait {
-        @apply mb-[1lh] w-3/4 shrink-0 md:mb-0 md:w-[min(30%,10em)];
+        @apply mb-[1lh] w-3/4 shrink-0 md:mb-0 md:w-[min(30%,7em)];
     }
 
     .portrait :global(img) {
@@ -79,13 +80,31 @@ const description =
 
     /* Bio on the left, stack list on the right */
     .about {
-        @apply grid gap-[1lh] md:grid-cols-[3fr_2fr] md:gap-x-[4ch];
+        @apply grid gap-[1lh] md:gap-x-[4ch];
+        @apply md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)];
 
         clear: both;
     }
 
     .bio {
-        @apply space-y-[1lh] md:text-2xl;
+        @apply space-y-[1lh] md:text-xl;
+    }
+
+    .hobbies {
+        @apply md:text-lg;
+    }
+
+    /* Dashes run to the width of the column, like the home header */
+    .hobbies h2 {
+        @apply overflow-hidden font-bold whitespace-nowrap;
+    }
+
+    .hobbies h2 span {
+        @apply font-normal opacity-50;
+    }
+
+    .hobbies li::before {
+        content: "- ";
     }
 
     .stack {
