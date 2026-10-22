@@ -55,6 +55,13 @@ const image = new URL("/og.png", Astro.site);
                 }
             } catch {}
         }
+        // Settings turned off, before paint, see lib/settings.ts
+        try {
+            const saved = JSON.parse(localStorage.getItem("settings") ?? "{}");
+            for (const key in saved) {
+                if (saved[key] === false) root.classList.add(`no-${key}`);
+            }
+        } catch {}
     </script>
     <ClientRouter />
 </head>

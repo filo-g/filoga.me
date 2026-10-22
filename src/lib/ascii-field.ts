@@ -1,5 +1,6 @@
 import { Media } from "./ascii-media";
 import { bend, unbend } from "./crt";
+import { isOn } from "./settings";
 
 // Glyphs from faint to dense
 const RAMP = " .:-=+*#%@";
@@ -124,10 +125,11 @@ export function asciiField(canvas: HTMLCanvasElement, first: HTMLElement) {
         ctx.fillStyle = colors.phosphor;
 
         ctx.font = `${parseFloat(root.fontSize)}px ${family}`;
+        const trail = isOn("trail");
         const top = RAMP.length - 1;
         for (let i = 0; i < cells.length; i++) {
             const { x, y } = cells[i];
-            const wave = waves.length ? ring(x, y) : 0;
+            const wave = waves.length && trail ? ring(x, y) : 0;
             const e = Math.max(energy[i], wave);
             if (!e || printed(sources[i])) continue;
             // A little flicker on the way down keeps it alive
@@ -192,7 +194,8 @@ export function asciiField(canvas: HTMLCanvasElement, first: HTMLElement) {
         reach: number,
         amount: (d: number) => number,
     ) {
-        for (let i = 0; i < cells.length; i++) {
+        // The trail setting only turns off the background, not images
+        for (let i = 0; isOn("trail") && i < cells.length; i++) {
             const dx = cells[i].x - x;
             const dy = cells[i].y - y;
             if (Math.abs(dx) > reach || Math.abs(dy) > reach) continue;
@@ -262,7 +265,7 @@ export function asciiField(canvas: HTMLCanvasElement, first: HTMLElement) {
             .then(() => img.decode());
 
     // Images of the page join once decoded, the real img stays as an
-    // empty slot
+    // empty slot. Off in the settings they stay plain images
     let sizes: ResizeObserver[] = [];
     function scan() {
         for (const observer of sizes) observer.disconnect();
@@ -272,11 +275,12 @@ export function asciiField(canvas: HTMLCanvasElement, first: HTMLElement) {
         for (const el of document.querySelectorAll(".is-ascii")) {
             el.classList.remove("is-ascii");
         }
+        if (!isOn("ascii")) return draw();
         for (const img of document.querySelectorAll<HTMLImageElement>(
             "[data-ascii] img",
         )) {
             loaded(img).then(() => {
-                if (!img.isConnected) return;
+                if (!img.isConnected || !isOn("ascii")) return;
                 media.push(new Media(img));
                 // Its box can still move once fonts and layout settle
                 const observer = new ResizeObserver(layout);
@@ -300,6 +304,12 @@ export function asciiField(canvas: HTMLCanvasElement, first: HTMLElement) {
         screen = next;
         watch();
         scan();
+        layout();
+    });
+    document.addEventListener("settings:change", (event) => {
+        const { key } = (event as CustomEvent<{ key: string }>).detail;
+        if (key === "ascii") scan();
+        if (key === "trail") energy.fill(0);
         layout();
     });
     // Where the curtain has gone so far, images show down to that line

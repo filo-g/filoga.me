@@ -105,7 +105,9 @@ const update = () => {
     cancelAnimationFrame(frame);
     frame = requestAnimationFrame(() => {
         if (!screenEl) return;
-        const shaped = !flat.some((query) => query.matches);
+        // Flat as well when turned off in the settings
+        const curved = !document.documentElement.classList.contains("no-lens");
+        const shaped = curved && !flat.some((query) => query.matches);
         const lens = shaped && !isSafari
             && !noLens.some((query) => query.matches);
 
@@ -163,4 +165,5 @@ function attach() {
 [...flat, ...noLens].forEach((query) =>
     query.addEventListener("change", update),
 );
+document.addEventListener("settings:change", update);
 document.addEventListener("astro:page-load", attach);

@@ -5,4 +5,5 @@ export const SECTIONS = [
     { label: "About", href: "/about", hint: "Who I am and what I use" },
     { label: "Contact", href: "/contact", hint: "Get in touch" },
     { label: "Resume", href: "/resume", hint: "Experience, also as PDF" },
+    { label: "Settings", href: "/settings", hint: "Screen effects on or off" },
 ];

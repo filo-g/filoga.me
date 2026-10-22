@@ -44,3 +44,12 @@
     71% { opacity: 0.99; }
     73% { opacity: 1; }
 }
+
+/* Turned off in the settings, the vignette stays */
+.no-scanlines .scanlines {
+    background: radial-gradient(transparent 65%, rgb(0 0 0 / 0.2) 100%);
+}
+
+.no-scanlines .refresh-band {
+    display: none;
+}
