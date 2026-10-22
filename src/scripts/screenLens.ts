@@ -3,7 +3,8 @@ import { CURVATURE } from "../lib/crt";
 const MAP_RESOLUTION = 0.25;
 const TUBE_RESOLUTION = 0.5;
 
-const screenEl = document.querySelector<HTMLElement>(".screen");
+// The screen is swapped on every page, the lens filter stays
+let screenEl: HTMLElement | null = null;
 const mapX = document.getElementById("screenLensMapX");
 const mapY = document.getElementById("screenLensMapY");
 const displacement = document.getElementById("screenLensDisplacement");
@@ -32,7 +33,14 @@ function alphaMap(width: number, height: number, value: Field) {
     return canvas.toDataURL();
 }
 
+// Built maps by size, so a new page of the same size reuses them
+let lensSize = "";
+let tubeSize = "";
+let tubeUrl = "";
+
 function buildLens(width: number, height: number) {
+    if (lensSize === `${width}x${height}`) return;
+    lensSize = `${width}x${height}`;
     const mapWidth = Math.max(2, Math.round(width * MAP_RESOLUTION));
     const mapHeight = Math.max(2, Math.round(height * MAP_RESOLUTION));
     // Max displacement at the corners (r^2 = 2)
@@ -50,6 +58,14 @@ function buildLens(width: number, height: number) {
 
 // Tube silhouette, for the glow and to shape the screen without the lens
 function buildTube(width: number, height: number) {
+    if (tubeSize !== `${width}x${height}`) {
+        tubeSize = `${width}x${height}`;
+        tubeUrl = tubeMap(width, height);
+    }
+    screenEl?.parentElement?.style.setProperty("--tube", `url(${tubeUrl})`);
+}
+
+function tubeMap(width: number, height: number) {
     const tubeWidth = Math.max(2, Math.round(width * TUBE_RESOLUTION));
     const tubeHeight = Math.max(2, Math.round(height * TUBE_RESOLUTION));
     // Anti-aliased edge about a pixel wide
@@ -60,8 +76,7 @@ function buildTube(width: number, height: number) {
         const reach = Math.max(Math.abs(u * bulge), Math.abs(v * bulge));
         return Math.min(1, Math.max(0, (1 - reach) / edge + 0.5));
     };
-    const tube = alphaMap(tubeWidth, tubeHeight, inside);
-    screenEl?.parentElement?.style.setProperty("--tube", `url(${tube})`);
+    return alphaMap(tubeWidth, tubeHeight, inside);
 }
 
 type UAData = { brands: { brand: string }[] };
@@ -82,58 +97,73 @@ const noLens = [
     ...(isChromium ? [matchMedia("(color-gamut: p3)")] : []),
 ];
 
-if (screenEl && mapX && mapY && displacement) {
-    let frame = 0;
-    let size = { width: 0, height: 0 };
+let frame = 0;
+let size = { width: 0, height: 0 };
+let observer: ResizeObserver | undefined;
 
-    const update = () => {
-        cancelAnimationFrame(frame);
-        frame = requestAnimationFrame(() => {
-            const shaped = !flat.some((query) => query.matches);
-            const lens = shaped && !isSafari
-                && !noLens.some((query) => query.matches);
+const update = () => {
+    cancelAnimationFrame(frame);
+    frame = requestAnimationFrame(() => {
+        if (!screenEl) return;
+        // Flat as well when turned off in the settings
+        const curved = !document.documentElement.classList.contains("no-lens");
+        const shaped = curved && !flat.some((query) => query.matches);
+        const lens = shaped && !isSafari
+            && !noLens.some((query) => query.matches);
 
-            if (shaped) buildTube(size.width, size.height);
-            if (lens) buildLens(size.width, size.height);
-            screenEl.classList.toggle("screen--lens", lens);
-            screenEl.classList.toggle("screen--tube", shaped && !lens);
-        });
-    };
+        if (shaped) buildTube(size.width, size.height);
+        if (lens) buildLens(size.width, size.height);
+        screenEl.classList.toggle("screen--lens", lens);
+        screenEl.classList.toggle("screen--tube", shaped && !lens);
+    });
+};
 
-    // Hit testing ignores the lens, map pointers to the DOM point shown
-    const bent = (x: number, y: number) => {
-        const box = screenEl.getBoundingClientRect();
-        const u = ((x - box.left) / box.width) * 2 - 1;
-        const v = ((y - box.top) / box.height) * 2 - 1;
-        const r2 = u * u + v * v;
-        return document.elementFromPoint(
-            x + u * r2 * CURVATURE * (box.width / 2),
-            y + v * r2 * CURVATURE * (box.height / 2),
-        );
-    };
-    const lensOn = () => screenEl.classList.contains("screen--lens");
-    const link = (el: Element | null) => el?.closest("a") ?? null;
+// Hit testing ignores the lens, map pointers to the DOM point shown
+const bent = (screen: HTMLElement, x: number, y: number) => {
+    const box = screen.getBoundingClientRect();
+    const u = ((x - box.left) / box.width) * 2 - 1;
+    const v = ((y - box.top) / box.height) * 2 - 1;
+    const r2 = u * u + v * v;
+    return document.elementFromPoint(
+        x + u * r2 * CURVATURE * (box.width / 2),
+        y + v * r2 * CURVATURE * (box.height / 2),
+    );
+};
+const link = (el: Element | null) => el?.closest("a") ?? null;
 
-    screenEl.addEventListener("click", (event) => {
+// Hooks the screen of the page just shown, the old one is gone
+function attach() {
+    screenEl = document.querySelector<HTMLElement>(".screen");
+    const screen = screenEl;
+    observer?.disconnect();
+    if (!screen || !mapX || !mapY || !displacement) return;
+    const lensOn = () => screen.classList.contains("screen--lens");
+
+    screen.addEventListener("click", (event) => {
         // Skip our own redirected click, it has no real coordinates
         if (!lensOn() || !event.isTrusted) return;
-        const shown = link(bent(event.clientX, event.clientY));
+        const shown = link(bent(screen, event.clientX, event.clientY));
         if (shown === link(event.target as Element)) return;
         event.preventDefault();
         event.stopPropagation();
         shown?.click();
     }, true);
 
-    screenEl.addEventListener("pointermove", (event) => {
-        const pointing = lensOn() && link(bent(event.clientX, event.clientY));
-        screenEl.classList.toggle("is-pointing", Boolean(pointing));
+    screen.addEventListener("pointermove", (event) => {
+        const pointing = lensOn()
+            && link(bent(screen, event.clientX, event.clientY));
+        screen.classList.toggle("is-pointing", Boolean(pointing));
     });
 
-    new ResizeObserver(([entry]) => {
+    observer = new ResizeObserver(([entry]) => {
         size = entry.contentRect;
         update();
-    }).observe(screenEl);
-    [...flat, ...noLens].forEach((query) =>
-        query.addEventListener("change", update),
-    );
+    });
+    observer.observe(screen);
 }
+
+[...flat, ...noLens].forEach((query) =>
+    query.addEventListener("change", update),
+);
+document.addEventListener("settings:change", update);
+document.addEventListener("astro:page-load", attach);

@@ -96,14 +96,16 @@ const section = `/${parts[0] ?? ""}`;
 
     /* Function key bar, fixed tab bar on mobile */
     .keys {
-        @apply fixed inset-x-0 bottom-0 z-10 flex justify-around;
+        @apply fixed inset-x-0 bottom-0 z-10 flex justify-around text-sm;
         @apply border-t border-phosphor/30 bg-screen py-3;
         @apply md:static md:ml-auto md:gap-[2ch] md:border-0 md:p-0;
         @apply md:bg-transparent md:text-xl;
     }
 
+    /* Phones have no number keys to press */
     .keys kbd {
-        @apply mr-[0.5ch] bg-phosphor px-[0.5ch] font-mono text-screen;
+        @apply mr-[0.5ch] hidden bg-phosphor px-[0.5ch] font-mono text-screen;
+        @apply md:inline;
     }
 
     .keys a[aria-current] {
@@ -111,22 +113,27 @@ const section = `/${parts[0] ?? ""}`;
     }
 
     /* Shortcuts off, the keys are just labels */
-    .keys-off .keys kbd {
+    :global(.no-keys) .keys kbd {
         @apply bg-phosphor/30;
     }
 </style>
 
 <script>
-    // Blinks from JS: a CSS animation would recompute the lens every frame
-    const cursor = document.querySelector(".console__cursor");
-    const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+    import { navigate } from "astro:transitions/client";
+    import { isOn } from "../lib/settings";
 
-    if (cursor && !reduce.matches) {
-        setInterval(() => cursor.classList.toggle("is-off"), 500);
+    // Blinks from JS: a CSS animation would recompute the lens every frame.
+    // Looked up each time, the router swaps the console on every page
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+    if (!reduce.matches) {
+        setInterval(() => {
+            document.querySelector(".console__cursor")
+                ?.classList.toggle("is-off");
+        }, 500);
     }
 
     const go = (link?: Element | null) => {
-        if (link instanceof HTMLAnchorElement) location.href = link.href;
+        if (link instanceof HTMLAnchorElement) navigate(link.href);
     };
     const steps: Record<string, number> = {
         ArrowDown: 1,
@@ -135,19 +142,10 @@ const section = `/${parts[0] ?? ""}`;
         k: -1,
     };
 
-    // Shortcuts can be turned off (WCAG 2.1.4), settings will set "keys"
-    const enabled = (() => {
-        try {
-            return localStorage.getItem("keys") !== "off";
-        } catch {
-            return true;
-        }
-    })();
-    document.documentElement.classList.toggle("keys-off", !enabled);
-
-    // 1-4 sections, Esc one directory up, arrows cycle lists
+    // Number keys jump to sections, Esc one directory up, arrows cycle
+    // lists. They can be turned off in the settings (WCAG 2.1.4)
     addEventListener("keydown", (event) => {
-        if (!enabled) return;
+        if (!isOn("keys")) return;
         if (event.metaKey || event.ctrlKey || event.altKey) return;
         const target = event.target as Element;
         if (target.closest("input, textarea, [contenteditable]")) return;

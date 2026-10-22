@@ -2,7 +2,14 @@
 import ScreenLens from "../components/filters/ScreenLens.astro";
 ---
 
-<svg id="svgFilters" width="0" height="0" style="position:absolute">
+<!-- Kept across pages, the lens maps are costly to build -->
+<svg
+    id="svgFilters"
+    width="0"
+    height="0"
+    style="position:absolute"
+    transition:persist
+>
     <defs>
         <ScreenLens />
     </defs>

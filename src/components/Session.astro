@@ -33,19 +33,21 @@ const {
 <script>
     import { busy, clear, type } from "../lib/console";
     import { reveal } from "../lib/curtain";
+    import { takeArrival } from "../lib/navigation";
     import { screenReady } from "../lib/screen";
     import { isMobile, sleep } from "../lib/terminal";
 
-    const root = document.querySelector<HTMLElement>("[data-session]");
-
-    // Types the command, then lifts the curtain over its output
-    async function run(root: HTMLElement) {
+    // Types the command, then lifts the curtain over its output. Coming
+    // from another page it was typed there already, see navigation.ts
+    async function run(root: HTMLElement, arrival?: string) {
         const mobile = isMobile();
         const command = root.dataset.command;
+        const echo = root.querySelector("[data-echo]");
+        if (arrival && echo) echo.textContent = arrival;
 
         // Nothing runs before the screen is on
         await screenReady();
-        if (command && !mobile) {
+        if (command && !mobile && !arrival) {
             await sleep(600);
             await type(command);
             await sleep(300);
@@ -68,8 +70,14 @@ const {
         document.dispatchEvent(new Event("curtain:lifted"));
     }
 
-    // Without .crt (no JS, reduced motion) the content shows as is
-    if (root && document.documentElement.classList.contains("crt")) run(root);
+    // Every page, the first one and each one the router swaps in
+    document.addEventListener("astro:page-load", () => {
+        const root = document.querySelector<HTMLElement>("[data-session]");
+        const arrival = takeArrival();
+        // Without .crt (no JS, reduced motion) the content shows as is
+        const crt = document.documentElement.classList.contains("crt");
+        if (root && crt) run(root, arrival);
+    });
 </script>
 
 <style>

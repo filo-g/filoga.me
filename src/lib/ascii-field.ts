@@ -1,5 +1,6 @@
 import { Media } from "./ascii-media";
 import { bend, unbend } from "./crt";
+import { isOn } from "./settings";
 
 // Glyphs from faint to dense
 const RAMP = " .:-=+*#%@";
@@ -25,7 +26,9 @@ interface Cell {
 // Background grid of chars lit by the pointer, fading on their own.
 // It reads as a trail although no path is kept, only energy per cell.
 // Images marked data-ascii are drawn on top, see ascii-media.ts
-export function asciiField(canvas: HTMLCanvasElement, screen: HTMLElement) {
+export function asciiField(canvas: HTMLCanvasElement, first: HTMLElement) {
+    // The router swaps the screen on every page, this layer stays
+    let screen = first;
     const context = canvas.getContext("2d");
     if (!context) return;
     const ctx = context;
@@ -122,10 +125,11 @@ export function asciiField(canvas: HTMLCanvasElement, screen: HTMLElement) {
         ctx.fillStyle = colors.phosphor;
 
         ctx.font = `${parseFloat(root.fontSize)}px ${family}`;
+        const trail = isOn("trail");
         const top = RAMP.length - 1;
         for (let i = 0; i < cells.length; i++) {
             const { x, y } = cells[i];
-            const wave = waves.length ? ring(x, y) : 0;
+            const wave = waves.length && trail ? ring(x, y) : 0;
             const e = Math.max(energy[i], wave);
             if (!e || printed(sources[i])) continue;
             // A little flicker on the way down keeps it alive
@@ -190,7 +194,8 @@ export function asciiField(canvas: HTMLCanvasElement, screen: HTMLElement) {
         reach: number,
         amount: (d: number) => number,
     ) {
-        for (let i = 0; i < cells.length; i++) {
+        // The trail setting only turns off the background, not images
+        for (let i = 0; isOn("trail") && i < cells.length; i++) {
             const dx = cells[i].x - x;
             const dy = cells[i].y - y;
             if (Math.abs(dx) > reach || Math.abs(dy) > reach) continue;
@@ -251,18 +256,62 @@ export function asciiField(canvas: HTMLCanvasElement, screen: HTMLElement) {
     }, { passive: true });
     document.addEventListener("mouseleave", () => (previous = undefined));
 
-    // Images join once decoded, the real img stays as an empty slot
-    for (const img of document.querySelectorAll<HTMLImageElement>(
-        "[data-ascii] img",
-    )) {
-        img.decode().then(() => {
-            media.push(new Media(img));
-            // Its box can still move once fonts and layout settle
-            new ResizeObserver(layout).observe(img);
-            layout();
-            img.closest("[data-ascii]")?.classList.add("is-ascii");
-        }, () => {});
+    // Lazy images may not have started loading, decode fails before that
+    const loaded = (img: HTMLImageElement) =>
+        (img.complete && img.naturalWidth
+            ? Promise.resolve()
+            : new Promise((resolve) =>
+                img.addEventListener("load", resolve, { once: true })))
+            .then(() => img.decode());
+
+    // Images of the page join once decoded, the real img stays as an
+    // empty slot. Off in the settings they stay plain images
+    let sizes: ResizeObserver[] = [];
+    function scan() {
+        for (const observer of sizes) observer.disconnect();
+        sizes = [];
+        media = [];
+        lifted = 0;
+        for (const el of document.querySelectorAll(".is-ascii")) {
+            el.classList.remove("is-ascii");
+        }
+        if (!isOn("ascii")) return draw();
+        for (const img of document.querySelectorAll<HTMLImageElement>(
+            "[data-ascii] img",
+        )) {
+            loaded(img).then(() => {
+                if (!img.isConnected || !isOn("ascii")) return;
+                media.push(new Media(img));
+                // Its box can still move once fonts and layout settle
+                const observer = new ResizeObserver(layout);
+                observer.observe(img);
+                sizes.push(observer);
+                layout();
+                img.closest("[data-ascii]")?.classList.add("is-ascii");
+            }, () => {});
+        }
     }
+    scan();
+
+    // Leaving the page, its images go with it while the curtain wipes
+    document.addEventListener("curtain:erase", () => {
+        media = [];
+        draw();
+    });
+    document.addEventListener("astro:after-swap", () => {
+        const next = document.querySelector<HTMLElement>(".screen");
+        if (!next) return;
+        screen = next;
+        watch();
+        scan();
+        layout();
+    });
+    document.addEventListener("settings:change", (event) => {
+        const { key } = (event as CustomEvent<{ key: string }>).detail;
+        if (key === "ascii") scan();
+        if (key === "trail") energy.fill(0);
+        layout();
+    });
     // Where the curtain has gone so far, images show down to that line
     document.addEventListener("curtain:row", (event) => {
         const bottom = (event as CustomEvent<number>).detail;
@@ -292,14 +341,19 @@ export function asciiField(canvas: HTMLCanvasElement, screen: HTMLElement) {
 
     new ResizeObserver(layout).observe(canvas);
     let lens = lensOn();
-    new MutationObserver(() => {
+    const classes = new MutationObserver(() => {
         if (lens === lensOn()) return;
         lens = lensOn();
         layout();
-    }).observe(screen, {
-        attributes: true,
-        attributeFilter: ["class"],
     });
+    function watch() {
+        classes.disconnect();
+        classes.observe(screen, {
+            attributes: true,
+            attributeFilter: ["class"],
+        });
+    }
+    watch();
     document.fonts.ready.then(layout);
     // Images draw in bold, a weight the page may not have loaded yet
     const face = root.getPropertyValue("--font-anonymous-pro");

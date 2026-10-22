@@ -75,3 +75,29 @@ export async function reveal(
     // Filled animations would keep repainting the lens
     done.forEach((animation) => animation.cancel());
 }
+
+// Wipes the content away, last row first, each one right to left. The
+// page is about to be swapped, so the clip is left in place
+export async function erase(el: HTMLElement, duration: number, bands = 0) {
+    const found = rows(el, bands || undefined).reverse();
+    const style = getComputedStyle(el);
+    const columns = Math.round(
+        el.offsetWidth / (parseFloat(style.fontSize) * 0.546),
+    );
+    for (const [i, row] of found.entries()) {
+        const last = i === 0;
+        await el.animate(
+            [
+                { clipPath: upTo(row, `calc(100% + 1em)`, last) },
+                { clipPath: upTo(row, `-1em`, last) },
+            ],
+            {
+                duration: duration / found.length,
+                easing: `steps(${columns})`,
+                fill: "forwards",
+            },
+        ).finished;
+    }
+    // Nothing of the old page shows until the new one is in
+    el.style.clipPath = "inset(0 0 100% 0)";
+}

@@ -1,0 +1,99 @@
+---
+import Session from "../components/Session.astro";
+import Root from "../layouts/Root.astro";
+import { SETTINGS } from "../lib/settings";
+---
+
+<Root
+    title="Settings"
+    description="Turn the screen effects of filoga.me on and off."
+    noindex
+>
+    <h1 class="sr-only">Settings</h1>
+    <Session command="cd settings">
+        <p class="lead">Turn the effects on and off, saved in this browser.</p>
+        <ul class="options">
+            {SETTINGS.map((setting) => (
+                <li>
+                    <button
+                        type="button"
+                        role="switch"
+                        aria-checked="true"
+                        data-setting={setting.key}
+                        disabled
+                    >
+                        <span class="box" aria-hidden="true">[x]</span>
+                        <span class="label">{setting.label}</span>
+                    </button>
+                    <span class="hint">{setting.hint}</span>
+                </li>
+            ))}
+        </ul>
+        <p class="note">
+            <!-- Replaced once the script runs -->
+            <span data-settings-note>Settings need JavaScript.</span>
+        </p>
+    </Session>
+</Root>
+
+<style>
+    @reference "../styles/global.css";
+
+    .lead {
+        @apply mb-[1lh] opacity-90 md:text-xl;
+    }
+
+    .options {
+        @apply grid gap-[0.5lh] md:text-xl;
+    }
+
+    .options li {
+        @apply grid gap-x-[3ch] md:grid-cols-[22ch_1fr] md:items-baseline;
+    }
+
+    button {
+        @apply flex cursor-pointer gap-[1ch] text-left font-bold;
+    }
+
+    button:disabled {
+        @apply cursor-default opacity-75;
+    }
+
+    .hint {
+        @apply text-sm opacity-75 md:text-base;
+    }
+
+    .note {
+        @apply mt-[1lh] text-sm opacity-75 md:text-base;
+    }
+</style>
+
+<script>
+    import { isOn, set, type Setting } from "../lib/settings";
+
+    // Runs on every visit to the page, the router swaps it in
+    document.addEventListener("astro:page-load", () => {
+        const buttons = document.querySelectorAll<HTMLButtonElement>(
+            "[data-setting]",
+        );
+        if (!buttons.length) return;
+
+        const sync = (button: HTMLButtonElement) => {
+            const on = isOn(button.dataset.setting as Setting);
+            button.setAttribute("aria-checked", String(on));
+            const box = button.querySelector(".box");
+            if (box) box.textContent = on ? "[x]" : "[ ]";
+        };
+        for (const button of buttons) {
+            button.disabled = false;
+            sync(button);
+            button.addEventListener("click", () => {
+                const key = button.dataset.setting as Setting;
+                set(key, !isOn(key));
+                sync(button);
+            });
+        }
+        const note = document.querySelector("[data-settings-note]");
+        if (note) note.textContent = "Changes apply right away.";
+    });
+</script>
