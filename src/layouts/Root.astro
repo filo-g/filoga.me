@@ -19,7 +19,8 @@ const {
 ---
 
 <!doctype html>
-<html lang="en">
+<!-- Pages swap in place, the curtain is the transition -->
+<html lang="en" transition:animate="none">
 	<Head
 		title={title}
 		description={description}
@@ -47,6 +48,7 @@ const {
 		<Footer />
 		<script>
 			import "../lib/screen";
+			import "../lib/navigation";
 		</script>
 	</body>
 </html>

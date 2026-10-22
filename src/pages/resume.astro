@@ -262,10 +262,12 @@ const description =
 </style>
 
 <script>
-    const button = document.querySelector<HTMLButtonElement>(".download");
-    if (button) {
+    // Every visit, the router swaps the page in without running this again
+    document.addEventListener("astro:page-load", () => {
+        const button = document.querySelector<HTMLButtonElement>(".download");
+        if (!button) return;
         button.hidden = false;
         // The print sheet turns the page into a plain CV, saved as PDF
         button.addEventListener("click", () => print());
-    }
+    });
 </script>

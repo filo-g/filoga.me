@@ -1,5 +1,6 @@
 ---
 import { Font } from 'astro:assets';
+import { ClientRouter } from 'astro:transitions';
 import { cleanPath } from '../lib/terminal';
 
 const { title, description, noindex = false, schema } = Astro.props;
@@ -55,4 +56,5 @@ const image = new URL("/og.png", Astro.site);
             } catch {}
         }
     </script>
+    <ClientRouter />
 </head>
